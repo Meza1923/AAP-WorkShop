@@ -1,0 +1,9 @@
+---
+- name: Hello Message
+  hosts: localhost
+  gather_facts: false
+
+  tasks:
+    - name: Print message
+      ansible.builtin.debug:
+        msg: "Hello from AAP!"
