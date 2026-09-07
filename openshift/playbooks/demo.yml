@@ -1,0 +1,17 @@
+---
+- name: AAP Objects
+  hosts: webservers                # <--- Inventory
+  become: true
+  vars:
+    admin_password: "{{ admin_password }}" # <--- Credentials
+  tasks:
+
+    - name: Deploy index.html
+      ansible.builtin.copy:         # <--- Execution Environment
+        dest: /var/www/html/index.html
+        content: "Managed by AAP\n"
+
+    - name: Restart httpd           # <--- Execution Environment
+      ansible.builtin.service:
+        name: httpd
+        state: restarted

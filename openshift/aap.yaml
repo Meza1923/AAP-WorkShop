@@ -1,0 +1,178 @@
+apiVersion: aap.ansible.com/v1alpha1
+kind: AnsibleAutomationPlatform
+metadata:
+  name: aap
+  namespace: aap
+spec:
+  extra_settings:
+    - setting: "REDIRECT_IS_HTTPS"
+      value: '"True"'
+  redis_mode: "cluster"
+  route_tls_termination_mechanism: edge
+  service_type: clusterip
+  image_pull_policy: IfNotPresent
+  ingress_type: route
+  no_log: true
+  mcp:
+    disabled: true
+  database:
+    resource_requirements:
+      requests:
+        cpu: 100m
+        memory: 256Mi
+      limits:
+        cpu: 500m
+        memory: 800Mi
+  api:
+    log_level: INFO
+    replicas: 3
+    resource_reqeuirements:
+      limits:
+        cpu: "2"
+        memory: "4Gi"
+      requests:
+        cpu: "1"
+        memory: "2Gi"
+  controller:
+    replicas: 3
+    extra_settings:
+      - setting: "ALLOW_LOCAL_RESOURCE_ACCESS"
+        value: "True"
+    ee_resource_requirements:
+      limits:
+        cpu: "2"
+        memory: "4Gi"
+      requests:
+        cpu: "1"
+        memory: "2Gi"
+    redis_resource_requirements:
+      limits:
+        cpu: "1"
+        memory: "2Gi"
+      requests:
+        cpu: "500m"
+        memory: "1Gi"
+    rsyslog_resource_requirements:
+      limits:
+        cpu: "1"
+        memory: "2Gi"
+      requests:
+        cpu: "500m"
+        memory: "1Gi"
+    task_resource_requirements:
+      limits:
+        cpu: "2"
+        memory: "4Gi"
+      requests:
+        cpu: "1"
+        memory: "2Gi"
+    web_resource_requirements:
+      limits:
+        cpu: "2"
+        memory: "4Gi"
+      requests:
+        cpu: "1"
+        memory: "2Gi"
+  eda:
+    api:
+      resource_reqeuirements:
+        limits:
+          cpu: "2"
+          memory: "4Gi"
+        requests:
+          cpu: "1"
+          memory: "2Gi"
+    event_stream:
+      resource_reqeuirements:
+        limits:
+          cpu: "2"
+          memory: "4Gi"
+        requests:
+          cpu: "1"
+          memory: "2Gi"
+    redis:
+      resource_reqeuirements:
+        limits:
+          cpu: "1"
+          memory: "2Gi"
+        requests:
+          cpu: "500m"
+          memory: "1Gi"
+    scheduler:
+      resource_reqeuirements:
+        limits:
+          cpu: "2"
+          memory: "4Gi"
+        requests:
+          cpu: "1"
+          memory: "2Gi"
+    ui:
+      resource_reqeuirements:
+        limits:
+          cpu: "2"
+          memory: "4Gi"
+        requests:
+          cpu: "1"
+          memory: "2Gi"
+    worker:
+      resource_reqeuirements:
+        limits:
+          cpu: "2"
+          memory: "4Gi"
+        requests:
+          cpu: "1"
+          memory: "2Gi"
+  hub:
+    storage_type: file
+    file_storage_size: 50Gi
+    file_storage_storage_class: gp3-csi
+    api:
+      resource_reqeuirements:
+        limits:
+          cpu: "2"
+          memory: "4Gi"
+        requests:
+          cpu: "1"
+          memory: "2Gi"
+    content:
+      resource_reqeuirements:
+        limits:
+          cpu: "2"
+          memory: "4Gi"
+        requests:
+          cpu: "1"
+          memory: "2Gi"
+    resource_reqeuirements:
+      limits:
+        cpu: "2"
+        memory: "4Gi"
+      requests:
+        cpu: "1"
+        memory: "2Gi"
+    web:
+      resource_reqeuirements:
+        limits:
+          cpu: "2"
+          memory: "4Gi"
+        requests:
+          cpu: "1"
+          memory: "2Gi"
+    worker:
+      resource_reqeuirements:
+        limits:
+          cpu: "2"
+          memory: "4Gi"
+        requests:
+          cpu: "1"
+          memory: "2Gi"
+    lightspeed:
+      disabled: true
+    redis:
+      replicas: 1
+      resource_reqeuirements:
+        limits:
+          cpu: "1"
+          memory: "2Gi"
+        requests:
+          cpu: "500m"
+          memory: "1Gi"
