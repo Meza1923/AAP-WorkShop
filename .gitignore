@@ -1,0 +1,5 @@
+openshift/s3-credentials.yaml
+/keys/*
+
+CaC/connection-token.yaml
+

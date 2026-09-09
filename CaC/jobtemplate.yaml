@@ -1,0 +1,11 @@
+apiVersion: tower.ansible.com/v1alpha1
+kind: JobTemplate
+metadata:
+  name: jobtemplate-4
+  namespace: aap
+spec:
+  connection_secret: aap-access
+  job_template_name: ExampleJobTemplate4
+  job_template_project: github-demo
+  job_template_playbook: playbooks/hello.yml
+  job_template_inventory: Demo Inventory

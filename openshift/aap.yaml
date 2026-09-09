@@ -19,20 +19,23 @@ spec:
     resource_requirements:
       requests:
         cpu: 100m
-        memory: 256Mi
+        memory: 200Mi
       limits:
-        cpu: 500m
+        cpu: 300m
         memory: 800Mi
+    storage_requirements:
+      requests:
+        storage: 50Gi
   api:
     log_level: INFO
-    replicas: 3
+    replicas: 1
     resource_reqeuirements:
       limits:
         cpu: "2"
         memory: "4Gi"
       requests:
-        cpu: "1"
-        memory: "2Gi"
+        cpu: "300m"
+        memory: "1Gi"
   controller:
     replicas: 3
     extra_settings:
@@ -43,36 +46,36 @@ spec:
         cpu: "2"
         memory: "4Gi"
       requests:
-        cpu: "1"
-        memory: "2Gi"
+        cpu: "300m"
+        memory: "1Gi"
     redis_resource_requirements:
       limits:
         cpu: "1"
         memory: "2Gi"
       requests:
-        cpu: "500m"
+        cpu: "300m"
         memory: "1Gi"
     rsyslog_resource_requirements:
       limits:
         cpu: "1"
         memory: "2Gi"
       requests:
-        cpu: "500m"
+        cpu: "300m"
         memory: "1Gi"
     task_resource_requirements:
       limits:
         cpu: "2"
         memory: "4Gi"
       requests:
-        cpu: "1"
-        memory: "2Gi"
+        cpu: "300m"
+        memory: "0.8Gi"
     web_resource_requirements:
       limits:
         cpu: "2"
         memory: "4Gi"
       requests:
-        cpu: "1"
-        memory: "2Gi"
+        cpu: "300m"
+        memory: "0.8Gi"
   eda:
     api:
       resource_reqeuirements:
@@ -80,23 +83,23 @@ spec:
           cpu: "2"
           memory: "4Gi"
         requests:
-          cpu: "1"
-          memory: "2Gi"
+          cpu: "300m"
+          memory: "0.8Gi"
     event_stream:
       resource_reqeuirements:
         limits:
           cpu: "2"
           memory: "4Gi"
         requests:
-          cpu: "1"
-          memory: "2Gi"
+          cpu: "300m"
+          memory: "0.8Gi"
     redis:
       resource_reqeuirements:
         limits:
           cpu: "1"
-          memory: "2Gi"
+          memory: "0.8Gi"
         requests:
-          cpu: "500m"
+          cpu: "300m"
           memory: "1Gi"
     scheduler:
       resource_reqeuirements:
@@ -104,67 +107,66 @@ spec:
           cpu: "2"
           memory: "4Gi"
         requests:
-          cpu: "1"
-          memory: "2Gi"
+          cpu: "300m"
+          memory: "1Gi"
     ui:
       resource_reqeuirements:
         limits:
           cpu: "2"
           memory: "4Gi"
         requests:
-          cpu: "1"
-          memory: "2Gi"
+          cpu: "300m"
+          memory: "1Gi"
     worker:
       resource_reqeuirements:
         limits:
           cpu: "2"
           memory: "4Gi"
         requests:
-          cpu: "1"
-          memory: "2Gi"
+          cpu: "300m"
+          memory: "1Gi"
   hub:
-    storage_type: file
-    file_storage_size: 50Gi
-    file_storage_storage_class: gp3-csi
+    storage_type: S3
+    object_storage_s3_secret: s3-credentials
     api:
       resource_reqeuirements:
         limits:
           cpu: "2"
           memory: "4Gi"
         requests:
-          cpu: "1"
-          memory: "2Gi"
+          cpu: "300m"
+          memory: "1Gi"
     content:
       resource_reqeuirements:
         limits:
           cpu: "2"
           memory: "4Gi"
         requests:
-          cpu: "1"
-          memory: "2Gi"
+          cpu: "300m"
+          memory: "1Gi"
     resource_reqeuirements:
       limits:
         cpu: "2"
         memory: "4Gi"
       requests:
-        cpu: "1"
-        memory: "2Gi"
+        cpu: "300m"
+        memory: "1Gi"
     web:
       resource_reqeuirements:
         limits:
           cpu: "2"
           memory: "4Gi"
         requests:
-          cpu: "1"
-          memory: "2Gi"
+          cpu: "300m"
+          memory: "1Gi"
     worker:
       resource_reqeuirements:
         limits:
           cpu: "2"
           memory: "4Gi"
         requests:
-          cpu: "1"
-          memory: "2Gi"
+          cpu: "300m"
+          memory: "1Gi"
     lightspeed:
       disabled: true
     redis:
@@ -174,5 +176,5 @@ spec:
           cpu: "1"
           memory: "2Gi"
         requests:
-          cpu: "500m"
+          cpu: "300m"
           memory: "1Gi"
