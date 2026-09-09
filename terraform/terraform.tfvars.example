@@ -1,0 +1,26 @@
+# Copy this file to terraform.tfvars and fill in the values you need,
+# or supply everything via TF_VAR_* environment variables instead.
+# terraform.tfvars is gitignored — never commit real credentials or key paths.
+
+aws_region            = "us-east-1"
+instance_count        = 10
+instance_type         = "t3.small"
+root_volume_size      = 20
+root_volume_type      = "gp3"
+allowed_ssh_cidr      = "0.0.0.0/0"
+name_prefix           = "aap-workshop"
+rhel_ami_name_filter  = "RHEL-9*"
+
+# Optional — leave empty ("") to use the account's default VPC/subnets instead.
+# Only set these if you have a specific existing VPC/subnet to deploy into
+# (it must already have an Internet Gateway + route table for SSH access to work).
+# vpc_id    = "vpc-0123456789abcdef0"
+# subnet_id = "subnet-0123456789abcdef0"
+
+# Required — no defaults. Prefer TF_VAR_* env vars over committing these,
+# even to a gitignored file:
+# aws_access_key       = ""
+# aws_secret_key       = ""
+# aws_session_token    = ""
+# aws_account_id       = ""
+# ssh_public_key_path  = "../keys/github-workshop.pub"
