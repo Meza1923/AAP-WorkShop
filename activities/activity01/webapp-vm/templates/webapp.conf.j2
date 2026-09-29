@@ -1,0 +1,11 @@
+# {{ ansible_managed }}
+server {
+    listen {{ nginx_port }};
+    listen [::]:{{ nginx_port }};
+    server_name _;
+    root /usr/share/nginx/html;
+
+    location / {
+        index index.html;
+    }
+}

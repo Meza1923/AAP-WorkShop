@@ -1,0 +1,118 @@
+---
+# Activity 1, Part A: deploy nginx on a RHEL9 VM.
+#
+# nginx_port and page_title are required and intentionally have NO defaults
+# anywhere in this repository. Do not add them to defaults, vars, group_vars
+# or host_vars: the exercise depends on them being missing on the first run.
+- name: Deploy nginx
+  hosts: all
+  become: true
+  gather_facts: true
+
+  tasks:
+    - name: Require nginx_port
+      ansible.builtin.assert:
+        that:
+          - nginx_port is defined
+        fail_msg: >-
+          Missing required variable 'nginx_port'.
+          See the README section "Fix the missing variables".
+        quiet: true
+
+    - name: Require page_title
+      ansible.builtin.assert:
+        that:
+          - page_title is defined
+          - page_title | string | length > 0
+        fail_msg: >-
+          Missing required variable 'page_title'.
+          See the README section "Fix the missing variables".
+        quiet: true
+
+    - name: Validate that nginx_port is an integer
+      ansible.builtin.assert:
+        that:
+          - nginx_port | string is match('^[0-9]+$')
+          - nginx_port | int >= 1
+          - nginx_port | int <= 65535
+        fail_msg: "nginx_port must be an integer between 1 and 65535, got '{{ nginx_port }}'."
+        quiet: true
+
+    - name: Install nginx
+      ansible.builtin.dnf:
+        name: nginx
+        state: present
+
+    - name: Deploy nginx server config
+      ansible.builtin.template:
+        src: webapp.conf.j2
+        dest: /etc/nginx/conf.d/webapp.conf
+        owner: root
+        group: root
+        mode: "0644"
+      notify: Restart nginx
+
+    - name: Deploy index.html
+      ansible.builtin.template:
+        src: index.html.j2
+        dest: /usr/share/nginx/html/index.html
+        owner: root
+        group: root
+        mode: "0644"
+
+    - name: Start and enable nginx
+      ansible.builtin.service:
+        name: nginx
+        state: started
+        enabled: true
+
+    - name: Gather service facts
+      ansible.builtin.service_facts:
+
+    - name: Set firewalld state
+      ansible.builtin.set_fact:
+        firewalld_running: >-
+          {{ ansible_facts['services']['firewalld.service']['state'] | default('absent') == 'running' }}
+
+    - name: Check if the port is already open in firewalld
+      ansible.builtin.command: "firewall-cmd --permanent --query-port={{ nginx_port }}/tcp"
+      register: firewall_query
+      changed_when: false
+      failed_when: firewall_query.rc not in [0, 1]
+      when: firewalld_running | bool
+
+    - name: Open the port in firewalld
+      ansible.builtin.command: "firewall-cmd --permanent --add-port={{ nginx_port }}/tcp"
+      changed_when: true
+      notify: Reload firewalld
+      when:
+        - firewalld_running | bool
+        - firewall_query.rc == 1
+
+    - name: Apply pending handlers before verifying
+      ansible.builtin.meta: flush_handlers
+
+    - name: Verify the page responds locally
+      ansible.builtin.uri:
+        url: "http://localhost:{{ nginx_port }}/"
+        return_content: true
+        status_code: 200
+      register: page_check
+      until: page_check.status == 200
+      retries: 5
+      delay: 2
+      changed_when: false
+
+    - name: Show the URL to open in the browser
+      ansible.builtin.debug:
+        msg: "Open http://{{ ansible_host | default(inventory_hostname) }}:{{ nginx_port }}/ in your browser."
+
+  handlers:
+    - name: Restart nginx
+      ansible.builtin.service:
+        name: nginx
+        state: restarted
+
+    - name: Reload firewalld
+      ansible.builtin.command: firewall-cmd --reload
+      changed_when: true
