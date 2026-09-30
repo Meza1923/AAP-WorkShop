@@ -27,5 +27,9 @@ for i in $(seq 1 "${NUM_USERS}"); do
   ns="${i}user-aap"
   kubectl create namespace "${ns}" --dry-run=client -o yaml | kubectl apply -f - > /dev/null
 
-  echo "Created user '${name}' with organization '${name}' and namespace '${ns}'"
+  kubectl create serviceaccount "${name}" -n "${ns}" --dry-run=client -o yaml | kubectl apply -f - > /dev/null
+  kubectl create rolebinding "${name}-admin" -n "${ns}" --clusterrole=admin \
+    --serviceaccount="${ns}:${name}" --dry-run=client -o yaml | kubectl apply -f - > /dev/null
+
+  echo "Created user '${name}' with organization '${name}', namespace '${ns}' and service account '${name}' (admin)"
 done
