@@ -28,6 +28,9 @@ All activities build on the same scenario, so each one continues the previous:
 - HTML directory served by that image: {WEBAPP_HTML_PATH}
 - Every participant has their own OpenShift namespace and a service account with
   edit rights limited to that namespace. Participants receive the namespace name and token.
+- AAP public URL (reachable from the internet, used for GitHub webhooks): {AAP_URL}
+- In Activity 2, participants fork {GIT_URL} into their own GitHub account.
+  Forks are public: nothing secret may ever be committed.
 
 ## Repository layout
 Repo root: `/root/github/AAP-WorkShop`

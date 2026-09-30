@@ -1,0 +1,6 @@
+---
+# Collections added on top of the base image.
+# Pinned so every build gives participants the same roles and variable names.
+collections:
+  - name: infra.aap_configuration
+    version: "4.10.0"

@@ -1,0 +1,38 @@
+---
+# Test data for the lab AAP. "Demo Credential" (Machine) already exists.
+# cactest-ocp-credential must be created by hand before the run, like
+# participants create their credentials: type "OpenShift or Kubernetes API
+# Bearer Token", organization Default. CaC never creates credentials.
+controller_job_templates:  # noqa: var-naming[no-role-prefix]
+  - name: cactest-nginx-template
+    organization: Default
+    description: Deploys nginx on my VM. Managed by CaC.
+    inventory: cactest-nginx-inventory
+    project: cactest-nginx-project
+    playbook: activities/activity01/webapp-vm/nginx.yml
+    execution_environment: Default execution environment
+    credentials:
+      - Demo Credential
+    become_enabled: true
+    survey_enabled: true
+    survey_spec:
+      name: ""
+      description: ""
+      spec:
+        - question_name: Page title
+          question_description: Title shown on the nginx page
+          required: true
+          type: text
+          variable: page_title
+          min: 0
+          max: 1024
+          default: ""
+  - name: cactest-ocp-template
+    organization: Default
+    description: Deploys the Automation Receipt on OpenShift. Managed by CaC.
+    inventory: cactest-ocp-inventory
+    project: cactest-nginx-project
+    playbook: activities/activity01/webapp-openshift/receipt.yml
+    execution_environment: Default execution environment
+    credentials:
+      - cactest-ocp-credential

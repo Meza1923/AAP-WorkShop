@@ -1,0 +1,15 @@
+---
+# Logic only: create or update every inventory listed in vars/main.yml.
+# Fields left out of an entry are not changed in AAP.
+- name: Ensure AAP inventories are configured
+  ansible.controller.inventory:
+    name: "{{ item.name }}"
+    organization: "{{ item.organization }}"
+    description: "{{ item.description | default(omit) }}"
+    state: present
+    controller_host: "{{ controller_host }}"
+    controller_oauthtoken: "{{ generated_token.ansible_facts.aap_token.token }}"
+    validate_certs: "{{ controller_validate_certs }}"
+  loop: "{{ controller_inventories }}"
+  loop_control:
+    label: "{{ item.name }}"

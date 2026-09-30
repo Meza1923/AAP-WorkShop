@@ -1,0 +1,6 @@
+
+FROM registry.redhat.io/ansible-automation-platform-27/ee-supported-rhel9:latest
+
+COPY requirements.yml .
+
+RUN ansible-galaxy collection install -r requirements.yml

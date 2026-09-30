@@ -1,0 +1,9 @@
+---
+# Test data for the lab AAP. Real values: organization Default and the
+# workshop repository.
+controller_projects:  # noqa: var-naming[no-role-prefix]
+  - name: cactest-nginx-project
+    organization: Default
+    scm_type: git
+    scm_url: https://github.com/Meza1923/AAP-WorkShop.git
+    scm_branch: main

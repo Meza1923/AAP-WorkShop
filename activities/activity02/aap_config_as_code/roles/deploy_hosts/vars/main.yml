@@ -1,0 +1,8 @@
+---
+# Data only: the hosts that must exist, with their inventory and host variables.
+# Names must match your existing AAP objects exactly, or CaC creates new ones.
+controller_hosts:  # noqa: var-naming[no-role-prefix]
+  - name: <vm-address>
+    inventory: <username>-nginx-inventory
+    variables:
+      nginx_port: 8080

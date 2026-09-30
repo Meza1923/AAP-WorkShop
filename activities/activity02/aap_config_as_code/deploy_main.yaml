@@ -1,0 +1,115 @@
+---
+# Activity 2: make AAP match the data in roles/*/vars/main.yml.
+#
+# Logic and data are separate: each role's tasks/main.yml loops over the list
+# in its vars/main.yml. To manage another object, add a block to a vars file;
+# the task files stay as they are.
+#
+# The job logs in with the credential attached to the job template, creates a
+# temporary token, runs every role with that token, and deletes the token at
+# the end, even if a role failed.
+#
+# This playbook only creates and updates objects. It never deletes objects
+# that are missing from the vars files. Credentials and the bootstrap objects
+# are not in the vars files and are never touched.
+- name: Configure Ansible Automation Platform
+  hosts: localhost
+  connection: local
+  gather_facts: false
+  vars_files:
+    - controller_vars.yml
+  vars:
+    ansible_python_interpreter: "{{ ansible_playbook_python }}"
+
+  tasks:
+    # awx_webhook_event_ref is empty for GitHub's "ping" and manual launches.
+    - name: Show which commit this job applies
+      ansible.builtin.debug:
+        msg:
+          - "Project revision used by this job: {{ cac_revision }}"
+          - "Commit sent by the webhook: {{ cac_pushed or 'none' }}"
+      vars:
+        cac_revision: "{{ awx_project_revision | default('not run from AAP') }}"
+        cac_pushed: "{{ awx_webhook_event_ref | default('', true) }}"
+
+    - name: Warn if the job did not get the pushed commit
+      ansible.builtin.debug:
+        msg: >-
+          WARNING: the webhook was sent for commit {{ awx_webhook_event_ref }},
+          but this job used {{ awx_project_revision }}. Check that
+          "Update revision on launch" is enabled on your CaC project
+          (README, Troubleshooting).
+      when:
+        - awx_webhook_event_ref | default('', true) | length > 0
+        - awx_project_revision is defined
+        - awx_webhook_event_ref != awx_project_revision
+
+    - name: Check that no example placeholders are left
+      ansible.builtin.assert:
+        that:
+          - cac_placeholders | length == 0
+        fail_msg: >-
+          The vars files still contain placeholders:
+          {{ cac_placeholders | join(', ') }}. Replace them with your own
+          values (README, step 4) and push again.
+        quiet: true
+      vars:
+        cac_roles:
+          - deploy_projects
+          - deploy_inventories
+          - deploy_hosts
+          - deploy_job_templates
+        cac_data_files: >-
+          {{ cac_roles
+             | map('regex_replace', '^(.*)$',
+                   playbook_dir ~ '/roles/\1/vars/main.yml')
+             | list }}
+        cac_placeholders: >-
+          {{ query('ansible.builtin.file', *cac_data_files) | join('\n')
+             | regex_findall('<[a-z-]+>') | unique }}
+
+    - name: Generate a temporary token for this run
+      ansible.platform.token:
+        description: "Temporary CaC token, job {{ awx_job_id | default('') }}"
+        scope: write
+        state: present
+        aap_hostname: "{{ controller_host }}"
+        aap_username: "{{ aap_username }}"
+        aap_password: "{{ aap_password }}"
+        aap_validate_certs: "{{ controller_validate_certs }}"
+      register: generated_token
+      no_log: true
+
+    - name: Apply the configuration
+      block:
+        # Order matters: a host needs its inventory, and a job template needs
+        # its project and inventory.
+        - name: Deploy projects
+          ansible.builtin.include_role:
+            name: deploy_projects
+
+        - name: Deploy inventories
+          ansible.builtin.include_role:
+            name: deploy_inventories
+
+        - name: Deploy hosts
+          ansible.builtin.include_role:
+            name: deploy_hosts
+
+        - name: Deploy job templates
+          ansible.builtin.include_role:
+            name: deploy_job_templates
+
+      always:
+        # A token cannot delete itself, so this task logs in with the
+        # username and password from the credential.
+        - name: Delete the temporary token
+          ansible.platform.token:
+            existing_token_id: >-
+              {{ generated_token.ansible_facts.aap_token.id | string }}
+            state: absent
+            aap_hostname: "{{ controller_host }}"
+            aap_username: "{{ aap_username }}"
+            aap_password: "{{ aap_password }}"
+            aap_validate_certs: "{{ controller_validate_certs }}"
+          no_log: true

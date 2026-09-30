@@ -1,0 +1,7 @@
+---
+# Test data for the lab AAP: one inventory for Part A, one for Part B.
+controller_inventories:  # noqa: var-naming[no-role-prefix]
+  - name: cactest-nginx-inventory
+    organization: Default
+  - name: cactest-ocp-inventory
+    organization: Default

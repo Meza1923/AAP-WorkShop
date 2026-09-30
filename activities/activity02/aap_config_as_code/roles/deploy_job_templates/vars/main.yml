@@ -1,0 +1,28 @@
+---
+# Data only: the job templates that must exist in AAP.
+# Credentials are referenced by name only. They stay in AAP and never go in Git.
+# Names must match your existing AAP objects exactly, or CaC creates new ones.
+controller_job_templates:  # noqa: var-naming[no-role-prefix]
+  - name: <username>-nginx-template
+    organization: <organization>
+    description: Deploys nginx on my VM. Managed by CaC.
+    inventory: <username>-nginx-inventory
+    project: <username>-nginx-project
+    playbook: activities/activity01/webapp-vm/nginx.yml
+    execution_environment: Default execution environment
+    credentials:
+      - <username>-nginx-credential
+    become_enabled: true
+    survey_enabled: true
+    survey_spec:
+      name: ""
+      description: ""
+      spec:
+        - question_name: Page title
+          question_description: Title shown on the nginx page
+          required: true
+          type: text
+          variable: page_title
+          min: 0
+          max: 1024
+          default: ""

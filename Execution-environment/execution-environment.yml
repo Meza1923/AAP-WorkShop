@@ -1,0 +1,20 @@
+---
+# Execution environment for the Activity 2 CaC job template.
+#
+# It is the AAP 2.7 Default execution environment (ee-supported-rhel9) plus
+# the infra.aap_configuration collection. The base image already contains
+# ansible-core, ansible-runner and the certified collections that
+# infra.aap_configuration depends on (ansible.controller, ansible.platform,
+# ansible.hub, ansible.eda), so the build only needs galaxy.ansible.com.
+version: 3
+
+images:
+  base_image:
+    # yamllint disable-line rule:line-length
+    name: registry.redhat.io/ansible-automation-platform-27/ee-supported-rhel9:latest
+
+dependencies:
+  galaxy: requirements.yml
+
+# options:
+  # package_manager_path: /usr/bin/microdnf

@@ -1,0 +1,6 @@
+---
+# Test role: reuses the logic of deploy_hosts.
+# Only vars/main.yml differs, so a test run checks the participants' tasks.
+- name: Run the deploy_hosts logic with the test data
+  ansible.builtin.include_tasks: >-
+    {{ role_path }}/../deploy_hosts/tasks/main.yml

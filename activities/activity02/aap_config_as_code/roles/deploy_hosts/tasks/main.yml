@@ -1,0 +1,16 @@
+---
+# Logic only: create or update every host listed in vars/main.yml.
+# Fields left out of an entry are not changed in AAP.
+- name: Ensure AAP hosts are configured
+  ansible.controller.host:
+    name: "{{ item.name }}"
+    inventory: "{{ item.inventory }}"
+    description: "{{ item.description | default(omit) }}"
+    variables: "{{ item.variables | default(omit) }}"
+    state: present
+    controller_host: "{{ controller_host }}"
+    controller_oauthtoken: "{{ generated_token.ansible_facts.aap_token.token }}"
+    validate_certs: "{{ controller_validate_certs }}"
+  loop: "{{ controller_hosts }}"
+  loop_control:
+    label: "{{ item.name }}"

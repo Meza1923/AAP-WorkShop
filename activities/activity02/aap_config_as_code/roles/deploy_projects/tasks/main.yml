@@ -1,0 +1,22 @@
+---
+# Logic only: create or update every project listed in vars/main.yml.
+# Fields left out of an entry are not changed in AAP.
+- name: Ensure AAP projects are configured
+  ansible.controller.project:
+    name: "{{ item.name }}"
+    organization: "{{ item.organization }}"
+    description: "{{ item.description | default(omit) }}"
+    scm_type: "{{ item.scm_type }}"
+    scm_url: "{{ item.scm_url }}"
+    scm_branch: "{{ item.scm_branch | default(omit) }}"
+    scm_credential: "{{ item.scm_credential | default(omit) }}"
+    scm_clean: "{{ item.scm_clean | default(omit) }}"
+    scm_update_on_launch: "{{ item.scm_update_on_launch | default(omit) }}"
+    wait: "{{ item.wait | default(omit) }}"
+    state: present
+    controller_host: "{{ controller_host }}"
+    controller_oauthtoken: "{{ generated_token.ansible_facts.aap_token.token }}"
+    validate_certs: "{{ controller_validate_certs }}"
+  loop: "{{ controller_projects }}"
+  loop_control:
+    label: "{{ item.name }}"
