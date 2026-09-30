@@ -3,11 +3,15 @@
 # namespace "cactest" are stand-ins: no workshop VM or participant namespace
 # exists yet. CaC only records them in AAP; nothing connects to them.
 controller_hosts:  # noqa: var-naming[no-role-prefix]
-  - name: 192.0.2.10
-    inventory: cactest-nginx-inventory
-    variables:
-      nginx_port: 8080
+  # - name: 192.0.2.10
+  #   inventory: cactest-nginx-inventory
+  #   variables:
+  #     nginx_port: 8080
   - name: localhost
     inventory: cactest-ocp-inventory
     variables:
       app_namespace: cactest
+  - name: 1.1.1.1
+    inventory: cactest-nginx-inventory
+    variables:
+      nginx_port: 7777
