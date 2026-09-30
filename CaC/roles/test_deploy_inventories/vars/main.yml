@@ -7,3 +7,14 @@ controller_inventories:  # noqa: var-naming[no-role-prefix]
   - name: cactest-ocp-inventory
     state: present  # present = create or update (default), absent = delete
     organization: Default
+  - name: example
+    state: present  # present = create or update (default), absent = delete
+    organization: Default
+  - name: cool
+    state: present  # present = create or update (default), absent = delete
+    organization: Default
+  - name: team1
+    state: present  # present = create or update (default), absent = delete
+    organization: hey
+
+
