@@ -1,14 +1,14 @@
 ---
-# Instructor test for Activity 2: the same flow as deploy_main.yaml, but it
-# runs the test_deploy_* roles, which hold real data for the lab AAP
-# (organization Default, objects prefixed "cactest-"). The test roles reuse
-# the task files of the deploy_* roles, so this checks the logic that
-# participants use.
+# Instructor test of the Activity 2 CaC flow, with real data for the lab AAP
+# (organization Default, objects prefixed "cactest-"). Self-contained: this
+# folder has its own roles and controller_vars.yml and does not depend on
+# activities/activity02. The task files are copies of the Activity 2 ones;
+# copy them again if those change.
 #
 # Before running, create the credential cactest-ocp-credential by hand (see
 # roles/test_deploy_job_templates/vars/main.yml). Run it from a job template
-# with a "Red Hat Ansible Automation Platform" credential, like
-# deploy_main.yaml.
+# with playbook CaC/deploy_test.yaml, the Default execution environment and a
+# "Red Hat Ansible Automation Platform" credential.
 - name: Configure Ansible Automation Platform (test data)
   hosts: localhost
   connection: local

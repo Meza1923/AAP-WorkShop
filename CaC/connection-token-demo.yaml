@@ -1,8 +1,0 @@
-apiVersion: v1
-kind: Secret
-metadata:
-  name: aap-access
-  type: Opaque
-stringData:
-  token: 
-  host: https://aap-aap.apps.cluster-gvcw9.gvcw9.sandbox2320.opentlc.com/

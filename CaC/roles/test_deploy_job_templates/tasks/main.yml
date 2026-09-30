@@ -1,0 +1,27 @@
+---
+# Logic only: create, update or delete the job templates in vars/main.yml.
+# Fields left out of an entry are not changed in AAP.
+# An entry with "state: absent" deletes that object. Objects missing
+# from vars/main.yml are never deleted.
+- name: Ensure AAP job templates are configured
+  ansible.controller.job_template:
+    name: "{{ item.name }}"
+    organization: "{{ item.organization | default(omit) }}"
+    description: "{{ item.description | default(omit) }}"
+    job_type: "{{ item.job_type | default('run') }}"
+    inventory: "{{ item.inventory | default(omit) }}"
+    project: "{{ item.project | default(omit) }}"
+    playbook: "{{ item.playbook | default(omit) }}"
+    execution_environment: "{{ item.execution_environment | default(omit) }}"
+    credentials: "{{ item.credentials | default(omit) }}"
+    become_enabled: "{{ item.become_enabled | default(omit) }}"
+    extra_vars: "{{ item.extra_vars | default(omit) }}"
+    survey_enabled: "{{ item.survey_enabled | default(omit) }}"
+    survey_spec: "{{ item.survey_spec | default(omit) }}"
+    state: "{{ item.state | default('present') }}"
+    controller_host: "{{ controller_host }}"
+    controller_oauthtoken: "{{ generated_token.ansible_facts.aap_token.token }}"
+    validate_certs: "{{ controller_validate_certs }}"
+  loop: "{{ controller_job_templates }}"
+  loop_control:
+    label: "{{ item.state | default('present') }}: {{ item.name }}"

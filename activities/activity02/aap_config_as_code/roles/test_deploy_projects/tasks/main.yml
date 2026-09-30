@@ -1,6 +1,0 @@
----
-# Test role: reuses the logic of deploy_projects.
-# Only vars/main.yml differs, so a test run checks the participants' tasks.
-- name: Run the deploy_projects logic with the test data
-  ansible.builtin.include_tasks: >-
-    {{ role_path }}/../deploy_projects/tasks/main.yml

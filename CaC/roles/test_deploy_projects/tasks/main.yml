@@ -1,0 +1,24 @@
+---
+# Logic only: create, update or delete the projects in vars/main.yml.
+# Fields left out of an entry are not changed in AAP.
+# An entry with "state: absent" deletes that object. Objects missing
+# from vars/main.yml are never deleted.
+- name: Ensure AAP projects are configured
+  ansible.controller.project:
+    name: "{{ item.name }}"
+    organization: "{{ item.organization }}"
+    description: "{{ item.description | default(omit) }}"
+    scm_type: "{{ item.scm_type | default(omit) }}"
+    scm_url: "{{ item.scm_url | default(omit) }}"
+    scm_branch: "{{ item.scm_branch | default(omit) }}"
+    scm_credential: "{{ item.scm_credential | default(omit) }}"
+    scm_clean: "{{ item.scm_clean | default(omit) }}"
+    scm_update_on_launch: "{{ item.scm_update_on_launch | default(omit) }}"
+    wait: "{{ item.wait | default(omit) }}"
+    state: "{{ item.state | default('present') }}"
+    controller_host: "{{ controller_host }}"
+    controller_oauthtoken: "{{ generated_token.ansible_facts.aap_token.token }}"
+    validate_certs: "{{ controller_validate_certs }}"
+  loop: "{{ controller_projects }}"
+  loop_control:
+    label: "{{ item.state | default('present') }}: {{ item.name }}"
