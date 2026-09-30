@@ -67,7 +67,7 @@ Add only the OpenShift credential. This job needs no Machine credential, because
 
 ### Step 5: Run it
 
-Launch the template. When the job finishes, look for the last task in the output. It prints the URL of your app. Open it in your browser.
+Launch the template. When the job finishes, look for the last task in the output. It prints the URL of your app, which looks like `https://<username>.<cluster-apps-domain>`. Open it in your browser.
 
 Why: the playbook creates a ConfigMap, a Deployment, a Service and a Route in your namespace. The page you see is served from the ConfigMap.
 

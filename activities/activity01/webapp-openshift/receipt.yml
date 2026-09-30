@@ -44,6 +44,28 @@
           namespace: "{{ app_namespace }}"
           deployed_at: "{{ now(utc=true).strftime('%Y-%m-%d %H:%M:%S UTC') }}"
 
+    # Route host = <launching user>.<apps domain>. The apps domain is taken from the
+    # API URL that the credential injects (https://api.<cluster> -> apps.<cluster>).
+    - name: Work out the Route host
+      ansible.builtin.set_fact:
+        route_host: >-
+          {{ (receipt.user if receipt.user != 'not run from AAP' else app_namespace)
+             | lower | regex_replace('[^a-z0-9-]', '-') }}.{{ apps_domain }}
+      vars:
+        apps_domain: >-
+          {{ lookup('ansible.builtin.env', 'K8S_AUTH_HOST')
+             | regex_replace('^https?://api[.]', 'apps.')
+             | regex_replace('[:/].*$', '') }}
+
+    - name: Check the Route host looks right
+      ansible.builtin.assert:
+        that:
+          - route_host is match('^[a-z0-9-]+[.]apps[.]')
+        fail_msg: >-
+          Could not work out the apps domain from the API URL in the credential
+          (got '{{ route_host }}'). Tell the instructor.
+        quiet: true
+
     - name: Render index.html
       ansible.builtin.set_fact:
         receipt_html: "{{ lookup('ansible.builtin.template', 'index.html.j2') }}"
@@ -150,6 +172,7 @@
             labels:
               app: "{{ app_name }}"
           spec:
+            host: "{{ route_host }}"
             to:
               kind: Service
               name: "{{ app_name }}"
