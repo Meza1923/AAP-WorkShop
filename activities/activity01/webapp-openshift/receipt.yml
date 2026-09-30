@@ -15,9 +15,10 @@
   vars:
     ansible_python_interpreter: "{{ ansible_playbook_python }}"
     app_name: automation-receipt
-    # TODO: set the workshop values before the workshop (see CLAUDE.md placeholders).
-    webapp_image: TODO_WEBAPP_IMAGE
-    webapp_html_path: TODO_WEBAPP_HTML_PATH
+    # TODO: set the workshop image before the workshop (see CLAUDE.md placeholders).
+    webapp_image: "{{ WEBAPP_IMAGE }}"
+    app_namespace: "{{ AAP_NAMESPACE }}"
+    webapp_html_path: /usr/share/nginx/html
 
   tasks:
     - name: Require app_namespace
@@ -28,14 +29,6 @@
         fail_msg: >-
           Missing required variable 'app_namespace'.
           See the README, step 2 (Create the inventory).
-        quiet: true
-
-    - name: Check the instructor values are filled in
-      ansible.builtin.assert:
-        that:
-          - not webapp_image.startswith('TODO')
-          - not webapp_html_path.startswith('TODO')
-        fail_msg: "webapp_image and webapp_html_path are still placeholders. Tell the instructor."
         quiet: true
 
     # AAP passes job metadata as awx_* (tower_* are the older names of the same data).
