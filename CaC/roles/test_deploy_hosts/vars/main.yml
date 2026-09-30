@@ -4,12 +4,12 @@
 # exists yet. CaC only records them in AAP; nothing connects to them.
 controller_hosts:  # noqa: var-naming[no-role-prefix]
   - name: 192.0.2.10
-    state: present
+    state: absent
     inventory: cactest-nginx-inventory
     variables:
       nginx_port: 8080
   - name: localhost
-    state: present  # present = create or update (default), absent = delete
+    state: absent  # present = create or update (default), absent = delete
     inventory: cactest-ocp-inventory
     variables:
       app_namespace: cactest
@@ -19,7 +19,7 @@ controller_hosts:  # noqa: var-naming[no-role-prefix]
     variables:
       nginx_port: 7777
   - name: a.example.com
-    state: present  # present = create or update (default), absent = delete
+    state: absent  # present = create or update (default), absent = delete
     inventory: cactest-nginx-inventory
     variables:
       nginx_port: 77277

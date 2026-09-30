@@ -5,7 +5,7 @@
 # Bearer Token", organization Default. CaC never creates credentials.
 controller_job_templates:  # noqa: var-naming[no-role-prefix]
   - name: cactest-nginx-template
-    state: present  # present = create or update (default), absent = delete
+    state: absent  # present = create or update (default), absent = delete
     organization: Default
     description: Deploys nginx on my VM. Managed by CaC.
     inventory: cactest-nginx-inventory
@@ -29,7 +29,7 @@ controller_job_templates:  # noqa: var-naming[no-role-prefix]
           max: 1024
           default: ""
   - name: cactest-ocp-template
-    state: present  # present = create or update (default), absent = delete
+    state: absent  # present = create or update (default), absent = delete
     organization: Default
     description: Deploys the Automation Receipt on OpenShift. Managed by CaC.
     inventory: cactest-ocp-inventory

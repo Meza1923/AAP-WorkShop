@@ -3,7 +3,7 @@
 # workshop repository.
 controller_projects:  # noqa: var-naming[no-role-prefix]
   - name: cactest-nginx-project
-    state: present  # present = create or update (default), absent = delete
+    state: absent  # present = create or update (default), absent = delete
     organization: Default
     scm_type: git
     scm_url: https://github.com/Meza1923/AAP-WorkShop.git

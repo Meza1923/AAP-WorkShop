@@ -2,19 +2,17 @@
 # Test data for the lab AAP: one inventory for Part A, one for Part B.
 controller_inventories:  # noqa: var-naming[no-role-prefix]
   - name: cactest-nginx-inventory
-    state: present  # present = create or update (default), absent = delete
+    state: absent  # present = create or update (default), absent = delete
     organization: Default
   - name: cactest-ocp-inventory
-    state: present  # present = create or update (default), absent = delete
+    state: absent  # present = create or update (default), absent = delete
     organization: Default
   - name: example
-    state: present  # present = create or update (default), absent = delete
+    state: absent  # present = create or update (default), absent = delete
     organization: Default
   - name: cool
-    state: present  # present = create or update (default), absent = delete
+    state: absent  # present = create or update (default), absent = delete
     organization: Default
   - name: team1
-    state: present  # present = create or update (default), absent = delete
+    state: absent  # present = create or update (default), absent = delete
     organization: hey
-
-

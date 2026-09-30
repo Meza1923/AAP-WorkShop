@@ -2,8 +2,8 @@
 # Instructor test of the Activity 2 CaC flow, with real data for the lab AAP
 # (organization Default, objects prefixed "cactest-"). Self-contained: this
 # folder has its own roles and controller_vars.yml and does not depend on
-# activities/activity02. The task files are copies of the Activity 2 ones;
-# copy them again if those change.
+# activities/activity02. The task files started as copies of the Activity 2
+# ones, plus a two-pass filter (cac_pass) so deletions run in reverse order.
 #
 # Before running, create the credential cactest-ocp-credential by hand (see
 # roles/test_deploy_job_templates/vars/main.yml). Run it from a job template
@@ -39,6 +39,34 @@
 
     - name: Apply the test configuration
       block:
+        # Pass 1: delete the "state: absent" entries, users of an object
+        # first (job templates, hosts, inventories, projects). Deleting an
+        # inventory before its hosts would fail the host lookups.
+        - name: Start the delete pass
+          ansible.builtin.set_fact:
+            cac_pass: absent
+
+        - name: Delete job templates
+          ansible.builtin.include_role:
+            name: test_deploy_job_templates
+
+        - name: Delete hosts
+          ansible.builtin.include_role:
+            name: test_deploy_hosts
+
+        - name: Delete inventories
+          ansible.builtin.include_role:
+            name: test_deploy_inventories
+
+        - name: Delete projects
+          ansible.builtin.include_role:
+            name: test_deploy_projects
+
+        # Pass 2: create or update everything else, dependencies first.
+        - name: Start the create and update pass
+          ansible.builtin.set_fact:
+            cac_pass: present
+
         - name: Deploy projects
           ansible.builtin.include_role:
             name: test_deploy_projects

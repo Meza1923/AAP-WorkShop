@@ -12,6 +12,15 @@
     controller_host: "{{ controller_host }}"
     controller_oauthtoken: "{{ generated_token.ansible_facts.aap_token.token }}"
     validate_certs: "{{ controller_validate_certs }}"
-  loop: "{{ controller_inventories }}"
+  loop: "{{ cac_items }}"
+  vars:
+    # deploy_test.yaml runs each role twice: cac_pass=absent (deletes, in
+    # reverse order) and cac_pass=present (creates and updates).
+    cac_items: >-
+      {{ controller_inventories
+         | selectattr('state', 'equalto', 'absent') | list
+         if cac_pass | default('present') == 'absent' else
+         controller_inventories
+         | rejectattr('state', 'equalto', 'absent') | list }}
   loop_control:
     label: "{{ item.state | default('present') }}: {{ item.name }}"
