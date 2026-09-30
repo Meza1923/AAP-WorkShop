@@ -1,16 +1,18 @@
 ---
-# Logic only: create or update every host listed in vars/main.yml.
+# Logic only: create, update or delete the hosts in vars/main.yml.
 # Fields left out of an entry are not changed in AAP.
+# An entry with "state: absent" deletes that object. Objects missing
+# from vars/main.yml are never deleted.
 - name: Ensure AAP hosts are configured
   ansible.controller.host:
     name: "{{ item.name }}"
     inventory: "{{ item.inventory }}"
     description: "{{ item.description | default(omit) }}"
     variables: "{{ item.variables | default(omit) }}"
-    state: present
+    state: "{{ item.state | default('present') }}"
     controller_host: "{{ controller_host }}"
     controller_oauthtoken: "{{ generated_token.ansible_facts.aap_token.token }}"
     validate_certs: "{{ controller_validate_certs }}"
   loop: "{{ controller_hosts }}"
   loop_control:
-    label: "{{ item.name }}"
+    label: "{{ item.state | default('present') }}: {{ item.name }}"

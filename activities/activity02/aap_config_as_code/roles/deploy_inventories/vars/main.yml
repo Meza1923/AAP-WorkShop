@@ -3,4 +3,5 @@
 # Names must match your existing AAP objects exactly, or CaC creates new ones.
 controller_inventories:  # noqa: var-naming[no-role-prefix]
   - name: <username>-nginx-inventory
+    state: present  # present = create or update (default), absent = delete
     organization: <organization>

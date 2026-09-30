@@ -3,6 +3,7 @@
 # Names must match your existing AAP objects exactly, or CaC creates new ones.
 controller_projects:  # noqa: var-naming[no-role-prefix]
   - name: <username>-nginx-project
+    state: present  # present = create or update (default), absent = delete
     organization: <organization>
     scm_type: git
     scm_url: <git-repo-url>

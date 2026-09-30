@@ -9,9 +9,9 @@
 # temporary token, runs every role with that token, and deletes the token at
 # the end, even if a role failed.
 #
-# This playbook only creates and updates objects. It never deletes objects
-# that are missing from the vars files. Credentials and the bootstrap objects
-# are not in the vars files and are never touched.
+# Entries are created or updated by default. An entry with "state: absent"
+# deletes that object. Objects missing from the vars files are never
+# deleted, so credentials and the bootstrap objects are never touched.
 - name: Configure Ansible Automation Platform
   hosts: localhost
   connection: local

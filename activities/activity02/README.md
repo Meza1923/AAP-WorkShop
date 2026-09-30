@@ -73,7 +73,7 @@ Each role separates logic from data:
 | `roles/deploy_hosts/vars/main.yml` | Hosts: name, the inventory they belong to, and their host variables. |
 | `roles/deploy_job_templates/vars/main.yml` | Job templates: inventory, project, playbook, execution environment, credentials, privilege escalation and survey. |
 
-Each `vars/main.yml` contains one example, modeled on your Part A objects. Values in angle brackets, like `<username>`, are placeholders you replace in step 4. Don't rename the top-level names (`controller_projects`, `controller_inventories`, `controller_hosts`, `controller_job_templates`): the task files loop over exactly these names.
+Each `vars/main.yml` contains one example, modeled on your Part A objects. Values in angle brackets, like `<username>`, are placeholders you replace in step 4. Every entry also has a `state` line: `present` creates or updates the object, `absent` deletes it (see step 5). Don't rename the top-level names (`controller_projects`, `controller_inventories`, `controller_hosts`, `controller_job_templates`): the task files loop over exactly these names.
 
 There is no role for credentials. Credentials stay in AAP, and job templates refer to them by name only.
 
@@ -195,6 +195,19 @@ Keep the indentation: each new entry starts with `  - name:`, aligned with the e
 
 If you leave out a field such as a survey, CaC doesn't change it. It only sets the fields you write down.
 
+To delete an object through Git, keep its entry and change its `state` to `absent`. A delete entry needs only the name and the organization (for a host: the name and the inventory):
+
+```yaml
+  - name: <username>-old-template
+    state: absent
+    organization: <organization>
+```
+
+Removing an entry from the file does NOT delete the object. CaC only deletes what you explicitly mark, so the deletion shows up in your commit history like any other change. Two things to watch:
+
+- Deleting an inventory also deletes its hosts. Remove those hosts' entries from `roles/deploy_hosts/vars/main.yml` in the same commit, or the next run fails looking for the inventory.
+- Never mark `<username>-ocp-inventory` as absent. Your CaC job template runs with it.
+
 <details>
 <summary>Solution</summary>
 
@@ -202,6 +215,7 @@ Add to `roles/deploy_inventories/vars/main.yml`:
 
 ```yaml
   - name: <username>-ocp-inventory
+    state: present
     organization: <organization>
 ```
 
@@ -209,6 +223,7 @@ Add to `roles/deploy_hosts/vars/main.yml`:
 
 ```yaml
   - name: localhost
+    state: present
     inventory: <username>-ocp-inventory
     variables:
       app_namespace: <namespace>
@@ -218,6 +233,7 @@ Add to `roles/deploy_job_templates/vars/main.yml`:
 
 ```yaml
   - name: <username>-ocp-template
+    state: present
     organization: <organization>
     description: Deploys the Automation Receipt on OpenShift. Managed by CaC.
     inventory: <username>-ocp-inventory
@@ -276,7 +292,7 @@ Your manual change from step 6 appears nowhere in Git. Changes made in the UI le
 - **Response 403, or signature errors:** the **Secret** in GitHub must be exactly the **Webhook key** from AAP, the **Content type** must be `application/json`, and the job template must have **Enable webhook** on with **Webhook service** GitHub. If you generated a new webhook key in AAP, paste it into GitHub again. After fixing, click **Redeliver** on the failed delivery.
 - **Redeliver doesn't start a new job:** if AAP already ran a job for that delivery, it answers `Webhook previously received, aborting.` and starts nothing. Push a new commit or launch the job template in AAP instead.
 - **Job ran but nothing changed:** compare **Project revision used by this job** in the job output with your latest commit. If they differ, or the output shows a WARNING about the commit, turn on **Update revision on launch** on `<username>-cac-project`. Also check that you pushed to the branch the project uses.
-- **Duplicate objects appeared:** a name in Git doesn't match the original object. Fix the name in Git and push. CaC never deletes anything, so delete the extra object by hand. Make sure you delete the new one, not your original.
+- **Duplicate objects appeared:** a name in Git doesn't match the original object. Fix the name in Git, and add a second entry with the wrong name and `state: absent` to remove the extra object. Push, and CaC deletes the duplicate while keeping your original.
 - **"Credential not found":** the job fails with an error like `Request to /api/controller/v2/credentials/?name=... returned 0 items, expected 1`. The credential name in `roles/deploy_job_templates/vars/main.yml` doesn't match the credential in AAP. The same message with `projects`, `inventories` or `organizations` in the path means that name doesn't match.
 - **Authentication to AAP failed:** the job fails at **Generate a temporary token for this run**. That task hides its output, because it handles your password. Check `<username>-aap-credential`: the URL is `<aap-url>`, and the username and password are the ones you log in to AAP with. Check that the credential is attached to `<username>-cac-template`. For certificate errors, ask the instructor.
 - **Placeholders left:** the job fails at **Check that no example placeholders are left** and lists them. Replace them and push again.
@@ -293,3 +309,5 @@ It does not restore:
 - Anything not in a `vars/main.yml` file, such as the three bootstrap objects.
 
 Manual changes in the UI are not kept either. The next CaC run replaces them with what Git says.
+
+CaC deletes an object only when its entry says `state: absent`. An object that is simply missing from the files stays in AAP.

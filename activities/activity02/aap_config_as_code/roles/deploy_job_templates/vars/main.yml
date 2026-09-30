@@ -4,6 +4,7 @@
 # Names must match your existing AAP objects exactly, or CaC creates new ones.
 controller_job_templates:  # noqa: var-naming[no-role-prefix]
   - name: <username>-nginx-template
+    state: present  # present = create or update (default), absent = delete
     organization: <organization>
     description: Deploys nginx on my VM. Managed by CaC.
     inventory: <username>-nginx-inventory
