@@ -1,0 +1,183 @@
+---
+# Activity 1, Part B: deploy the "Automation Receipt" webapp on OpenShift.
+#
+# Authentication comes only from the AAP OpenShift/Kubernetes credential, which
+# injects K8S_AUTH_HOST and K8S_AUTH_API_KEY (and friends) as environment
+# variables. kubernetes.core reads them by itself. Never put the API URL or the
+# token in this repository.
+#
+# app_namespace is required and intentionally has NO default anywhere in this
+# repository. Participants set it as a host variable on localhost.
+- name: Deploy the Automation Receipt
+  hosts: localhost
+  connection: local
+  gather_facts: false
+  vars:
+    ansible_python_interpreter: "{{ ansible_playbook_python }}"
+    app_name: automation-receipt
+    # TODO: set the workshop values before the workshop (see CLAUDE.md placeholders).
+    webapp_image: TODO_WEBAPP_IMAGE
+    webapp_html_path: TODO_WEBAPP_HTML_PATH
+
+  tasks:
+    - name: Require app_namespace
+      ansible.builtin.assert:
+        that:
+          - app_namespace is defined
+          - app_namespace | string | length > 0
+        fail_msg: >-
+          Missing required variable 'app_namespace'.
+          See the README, step 2 (Create the inventory).
+        quiet: true
+
+    - name: Check the instructor values are filled in
+      ansible.builtin.assert:
+        that:
+          - not webapp_image.startswith('TODO')
+          - not webapp_html_path.startswith('TODO')
+        fail_msg: "webapp_image and webapp_html_path are still placeholders. Tell the instructor."
+        quiet: true
+
+    # AAP passes job metadata as awx_* (tower_* are the older names of the same data).
+    # The fallback keeps the playbook usable outside AAP.
+    - name: Collect job metadata and deployment time
+      ansible.builtin.set_fact:
+        receipt:
+          job_id: "{{ awx_job_id | default(tower_job_id | default('not run from AAP')) }}"
+          job_template: "{{ awx_job_template_name | default(tower_job_template_name | default('not run from AAP')) }}"
+          user: "{{ awx_user_name | default(tower_user_name | default('not run from AAP')) }}"
+          launch_type: "{{ awx_job_launch_type | default(tower_job_launch_type | default('not run from AAP')) }}"
+          revision: "{{ awx_project_revision | default(tower_project_revision | default('not run from AAP')) }}"
+          namespace: "{{ app_namespace }}"
+          deployed_at: "{{ now(utc=true).strftime('%Y-%m-%d %H:%M:%S UTC') }}"
+
+    - name: Render index.html
+      ansible.builtin.set_fact:
+        receipt_html: "{{ lookup('ansible.builtin.template', 'index.html.j2') }}"
+
+    - name: Deploy the ConfigMap with the receipt page
+      kubernetes.core.k8s:
+        state: present
+        definition:
+          apiVersion: v1
+          kind: ConfigMap
+          metadata:
+            name: "{{ app_name }}"
+            namespace: "{{ app_namespace }}"
+            labels:
+              app: "{{ app_name }}"
+          data:
+            index.html: "{{ receipt_html }}"
+
+    - name: Deploy the Deployment
+      kubernetes.core.k8s:
+        state: present
+        wait: true
+        wait_timeout: 180
+        definition:
+          apiVersion: apps/v1
+          kind: Deployment
+          metadata:
+            name: "{{ app_name }}"
+            namespace: "{{ app_namespace }}"
+            labels:
+              app: "{{ app_name }}"
+          spec:
+            replicas: 1
+            selector:
+              matchLabels:
+                app: "{{ app_name }}"
+            template:
+              metadata:
+                labels:
+                  app: "{{ app_name }}"
+                annotations:
+                  receipt/checksum: "{{ receipt_html | hash('sha256') }}"
+              spec:
+                containers:
+                  - name: web
+                    image: "{{ webapp_image }}"
+                    ports:
+                      - containerPort: 8080
+                    resources:
+                      requests:
+                        cpu: 20m
+                        memory: 32Mi
+                      limits:
+                        cpu: 100m
+                        memory: 64Mi
+                    readinessProbe:
+                      httpGet:
+                        path: /
+                        port: 8080
+                      initialDelaySeconds: 2
+                      periodSeconds: 5
+                    livenessProbe:
+                      httpGet:
+                        path: /
+                        port: 8080
+                      initialDelaySeconds: 10
+                      periodSeconds: 10
+                    volumeMounts:
+                      - name: html
+                        mountPath: "{{ webapp_html_path }}"
+                volumes:
+                  - name: html
+                    configMap:
+                      name: "{{ app_name }}"
+
+    - name: Deploy the Service
+      kubernetes.core.k8s:
+        state: present
+        definition:
+          apiVersion: v1
+          kind: Service
+          metadata:
+            name: "{{ app_name }}"
+            namespace: "{{ app_namespace }}"
+            labels:
+              app: "{{ app_name }}"
+          spec:
+            selector:
+              app: "{{ app_name }}"
+            ports:
+              - name: http
+                port: 8080
+                targetPort: 8080
+
+    - name: Deploy the Route
+      kubernetes.core.k8s:
+        state: present
+        definition:
+          apiVersion: route.openshift.io/v1
+          kind: Route
+          metadata:
+            name: "{{ app_name }}"
+            namespace: "{{ app_namespace }}"
+            labels:
+              app: "{{ app_name }}"
+          spec:
+            to:
+              kind: Service
+              name: "{{ app_name }}"
+            port:
+              targetPort: http
+            tls:
+              termination: edge
+              insecureEdgeTerminationPolicy: Redirect
+      register: route
+
+    - name: Verify the Route responds
+      ansible.builtin.uri:
+        url: "https://{{ route.result.spec.host }}/"
+        validate_certs: false
+        status_code: 200
+      register: route_check
+      until: route_check.status == 200
+      retries: 10
+      delay: 3
+      changed_when: false
+
+    - name: Show the URL to open in the browser
+      ansible.builtin.debug:
+        msg: "Open https://{{ route.result.spec.host }}/ in your browser."

@@ -22,6 +22,12 @@ All activities build on the same scenario, so each one continues the previous:
 - Git repo URL used by participants: will be provide in the future
 - Every participant has their own VM and shares one AAP instance with everyone else.
 - nginx port is always 8080 (already allowed by SELinux on RHEL; no SELinux handling needed).
+- OpenShift API URL: {OCP_API_URL}
+- OpenShift version: {OCP_VERSION}
+- Webapp container image (non-root, listens on 8080): {WEBAPP_IMAGE}
+- HTML directory served by that image: {WEBAPP_HTML_PATH}
+- Every participant has their own OpenShift namespace and a service account with
+  edit rights limited to that namespace. Participants receive the namespace name and token.
 
 ## Repository layout
 Repo root: `/root/github/AAP-WorkShop`
@@ -49,6 +55,25 @@ Repo root: `/root/github/AAP-WorkShop`
 - Playbooks must pass `ansible-lint` (production profile if feasible) and `ansible-playbook --syntax-check`.
 - Prefer `ansible.builtin` modules. Any 
 other collection must exist in {EE_NAME}, or be listed in `collections/requirements.yml`.
+
+## Writing style for participant READMEs
+Participants read these during a live workshop, with the instructor in the room.
+Write detailed but human: like an experienced colleague walking someone through it.
+- Give every detail needed to complete a step, and nothing beyond that.
+- Explain "why" in one or two plain sentences. Do not turn steps into lectures;
+  the instructor covers theory in the session.
+- Use short sentences and address the reader as "you".
+- No marketing or hype words ("powerful", "seamless", "robust", "unlock", "leverage").
+- No filler openings ("In this section we will explore..."). Start with what to do.
+- No emojis, no exclamation marks, no excessive bold. Bold only UI element names
+  the participant must click or find.
+- Do not repeat the same explanation in several places. Say it once, where it's needed.
+
+Example of the right tone:
+  Bad:  "Credentials are a powerful and essential feature of AAP that seamlessly
+         enable secure authentication across your entire automation estate!"
+  Good: "AAP stores your SSH key encrypted, so it never appears in your playbook or
+         in Git. The job uses it to log in to your VM."
 
 ## Global rules
 - Never invent documentation URLs. If an exact link can't be confirmed, write `TODO: link to <topic> docs`.

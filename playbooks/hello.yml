@@ -7,3 +7,6 @@
     - name: Print message
       ansible.builtin.debug:
         msg: "Hello from AAP!"
+
+    - name: command collections
+      shell: ansible-galaxy collection list

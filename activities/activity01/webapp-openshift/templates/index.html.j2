@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Automation Receipt</title>
+<style>
+  :root { --bg: #0d1117; --card: #161b22; --line: #30363d; --text: #e6edf3; --muted: #9da7b3; --accent: #58a6ff; --done: #3fb950; }
+  * { box-sizing: border-box; }
+  body { margin: 0; min-height: 100vh; background: var(--bg); color: var(--text);
+         font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+         display: flex; align-items: center; justify-content: center; padding: 24px; }
+  main { width: 100%; max-width: 760px; }
+  h1 { font-size: 1.6rem; margin: 0 0 4px; }
+  .sub { color: var(--muted); margin: 0 0 24px; }
+  .job { color: var(--accent); }
+  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 12px; }
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: 14px 16px; }
+  .label { color: var(--muted); font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.06em; }
+  .value { margin-top: 6px; font-size: 1.05rem; word-break: break-all; }
+  .journey { display: flex; gap: 8px; margin-top: 24px; flex-wrap: wrap; }
+  .step { flex: 1 1 140px; padding: 10px 12px; border-radius: 8px; border: 1px solid var(--line);
+          background: var(--card); font-size: 0.9rem; color: var(--muted); }
+  .step.done { border-color: var(--done); color: var(--text); }
+  .step.done::before { content: "\2713  "; color: var(--done); }
+  .step.next::before { content: "\2192  "; color: var(--muted); }
+</style>
+</head>
+<body>
+<main>
+  <h1>Automation Receipt</h1>
+  <p class="sub">Deployed by AAP job <span class="job">#{{ receipt.job_id | e }}</span></p>
+  <div class="grid">
+    <div class="card"><div class="label">Job template</div><div class="value">{{ receipt.job_template | e }}</div></div>
+    <div class="card"><div class="label">Launched by</div><div class="value">{{ receipt.user | e }} ({{ receipt.launch_type | e }})</div></div>
+    <div class="card"><div class="label">Project revision</div><div class="value">{{ receipt.revision | e }}</div></div>
+    <div class="card"><div class="label">Namespace</div><div class="value">{{ receipt.namespace | e }}</div></div>
+    <div class="card"><div class="label">Deployed at</div><div class="value">{{ receipt.deployed_at | e }}</div></div>
+  </div>
+  <div class="journey">
+    <div class="step done">VM deployed</div>
+    <div class="step done">OpenShift deployed</div>
+    <div class="step next">CaC</div>
+    <div class="step next">EDA</div>
+  </div>
+</main>
+</body>
+</html>
