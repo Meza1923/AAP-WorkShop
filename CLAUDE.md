@@ -17,7 +17,7 @@ All activities build on the same scenario, so each one continues the previous:
 ## Environment facts
 - AAP version: 2.7
 - VM operating system: RHEL9
-- SSH username on VMs: lab-user
+- SSH username on VMs: ec2-user
 - Execution environment: Default
 - Git repo URL used by participants: will be provide in the future
 - Every participant has their own VM and shares one AAP instance with everyone else.

@@ -10,7 +10,7 @@ You'll set up everything AAP needs to run a playbook on your own VM, then use it
 | | |
 |---|---|
 | VM address | `<vm-address>` |
-| SSH user | `lab-user` |
+| SSH user | `ec2-user` |
 | SSH private key | `<ssh-private-key>` |
 | AAP URL | `<aap-url>` |
 | AAP login | `<username>` / `<password>` |
@@ -29,7 +29,7 @@ Everyone shares this AAP, so start every object name with your username:
 
 ### Step 1: Machine credential
 
-Create a **Machine** credential named `<username>-nginx-credential`. Username `lab-user`, paste in the SSH private key.
+Create a **Machine** credential named `<username>-nginx-credential`. Username `ec2-user`, paste in the SSH private key.
 
 Why: the key lives encrypted in AAP. It never goes in a playbook, an inventory or Git.
 
@@ -149,7 +149,7 @@ Why: running a playbook twice shouldn't change anything the second time. That's 
 ## 5. Troubleshooting
 
 - **Project sync fails:** check the Git URL, and that AAP can reach the repo.
-- **Host unreachable:** check the host name is your `<vm-address>`, the user is `lab-user`, and you pasted the whole key, BEGIN and END lines included.
+- **Host unreachable:** check the host name is your `<vm-address>`, the user is `ec2-user`, and you pasted the whole key, BEGIN and END lines included.
 - **Privilege escalation error:** turn on privilege escalation in the job template.
 - **No survey when launching:** it's probably saved but not enabled.
 - **Still asking for `page_title`:** check the survey variable name for typos. It must be exactly `page_title`. Same goes for `nginx_port` in the host variables.

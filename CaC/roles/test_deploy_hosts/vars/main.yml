@@ -2,7 +2,7 @@
 # 192.0.2.10 stands in for the workshop VM: no VM exists yet. Replace it with
 # the real VM address to run Part A. localhost needs no variables.
 controller_hosts:  # noqa: var-naming[no-role-prefix]
-  - name: bastion.vc4zx.sandbox2372.opentlc.com
+  - name: ec2-63-183-3-83.eu-central-1.compute.amazonaws.com
     state: present  # present = create or update (default), absent = delete
     inventory: cactest-nginx-inventory
     variables:

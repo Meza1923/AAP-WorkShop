@@ -89,6 +89,12 @@ variable "allowed_ssh_cidr" {
   default     = "0.0.0.0/0"
 }
 
+variable "allowed_web_cidr" {
+  description = "CIDR block allowed to open the nginx page (port 8080) on the instances. Defaults to open access so participants can reach their page from anywhere."
+  type        = string
+  default     = "0.0.0.0/0"
+}
+
 ### RHEL AMI selection ###
 
 variable "rhel_ami_owner" {

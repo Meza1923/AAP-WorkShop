@@ -80,6 +80,15 @@ resource "aws_security_group" "ssh" {
     cidr_blocks = [var.allowed_ssh_cidr]
   }
 
+  # Activity 1 Part A: participants open http://<vm-address>:8080
+  ingress {
+    description = "nginx web page"
+    from_port   = 8080
+    to_port     = 8080
+    protocol    = "tcp"
+    cidr_blocks = [var.allowed_web_cidr]
+  }
+
   egress {
     from_port   = 0
     to_port     = 0

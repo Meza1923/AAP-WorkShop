@@ -1,6 +1,6 @@
 # Terraform — RHEL EC2 lab servers
 
-Provisions 10 RHEL EC2 instances (t3.small, 20GB gp3 root disk), reachable by SSH key.
+Provisions RHEL EC2 instances (default 10, set `instance_count`; t3.small, 20GB gp3 root disk), reachable by SSH key as `ec2-user`. The security group opens SSH (22) and the Activity 1 nginx page (8080).
 
 By default, instances are spread across all subnets of the account's default VPC. To use a specific existing VPC/subnet instead, set `vpc_id` and/or `subnet_id` (see `terraform.tfvars.example`) — that VPC/subnet must already have an Internet Gateway and a route table with a `0.0.0.0/0` route, or the instances won't be reachable over SSH even though the security group allows it.
 
