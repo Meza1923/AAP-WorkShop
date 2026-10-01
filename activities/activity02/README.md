@@ -190,6 +190,13 @@ Same idea as step 4, for your Part B objects. In each file below, copy the examp
 | `roles/deploy_hosts/vars/main.yml` | name `localhost`, inventory `<username>-ocp-inventory`, and delete the `variables` lines |
 | `roles/deploy_job_templates/vars/main.yml` | name `<username>-ocp-template`, a description for Part B, inventory `<username>-ocp-inventory`, playbook `activities/activity01/webapp-openshift/receipt.yml`, credential `<username>-ocp-credential`, delete the `become_enabled` line, and make the survey ask `AAP_NAMESPACE` and `WEBAPP_IMAGE` |
 
+Also add these two lines to the job template entry, under `credentials`. They tell your Automation Receipt that the template now comes from Git:
+
+```yaml
+    extra_vars:
+      managed_by: cac
+```
+
 There is no new project: Part B uses `<username>-nginx-project`, which is already in the file. Keep the survey in Git, because in step 7 CaC rebuilds the template from it.
 
 <details>
@@ -224,6 +231,8 @@ There is no new project: Part B uses `<username>-nginx-project`, which is alread
     execution_environment: Default execution environment
     credentials:
       - <username>-ocp-credential
+    extra_vars:
+      managed_by: cac
     survey_enabled: true
     survey_spec:
       name: ""
@@ -271,7 +280,7 @@ Open the template list: `<username>-ocp-template` is back. Launch it, enter your
 
 Why: Git holds the full description of the template, so CaC can rebuild it from scratch.
 
-Expected result: the Automation Receipt shows a new job number and the job template name `<username>-ocp-template`. The restored template is a new object, so its job history starts empty.
+Expected result: the Automation Receipt shows a new job number and the job template name `<username>-ocp-template`, and its workshop journey now marks **Configuration as Code** as done. The restored template is a new object, so its job history starts empty.
 
 A deleted credential could NOT be restored this way. Git only holds its name, never the token or SSH key behind it, and it must stay that way because your fork is public. If a credential is deleted, the CaC job fails because it can't find the credential by name, and you recreate the credential by hand from the key or token you were given. Don't try this; just keep it in mind.
 

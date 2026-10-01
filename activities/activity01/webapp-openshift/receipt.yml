@@ -46,6 +46,60 @@
           namespace: "{{ app_namespace }}"
           deployed_at: "{{ now(utc=true).strftime('%Y-%m-%d %H:%M:%S UTC') }}"
 
+    # Workshop progress for the journey strip. Read-only: a missing object
+    # means that activity has not been reached yet.
+    - name: Read the app as it is before this run
+      kubernetes.core.k8s_info:
+        api_version: apps/v1
+        kind: Deployment
+        name: "{{ app_name }}"
+        namespace: "{{ app_namespace }}"
+      register: current_deployment
+
+    - name: Read the previous receipt
+      kubernetes.core.k8s_info:
+        api_version: v1
+        kind: ConfigMap
+        name: "{{ app_name }}"
+        namespace: "{{ app_namespace }}"
+      register: previous_receipt
+
+    # Created in Activity 3. Not finding it (or not being allowed to read it)
+    # only means EDA is not connected yet.
+    - name: Check whether alerts are routed to EDA
+      kubernetes.core.k8s_info:
+        api_version: monitoring.coreos.com/v1beta1
+        kind: AlertmanagerConfig
+        name: "{{ app_name }}-eda"
+        namespace: "{{ app_namespace }}"
+      register: eda_route
+      failed_when: false
+
+    # managed_by=cac is set on the job template only through the Activity 2
+    # CaC config. A Deployment with 0 available pods means this run restores it.
+    - name: Work out the workshop progress
+      ansible.builtin.set_fact:
+        progress:
+          cac: "{{ 'done' if (managed_by | default('')) == 'cac' else 'next' }}"
+          eda: >-
+            {{ 'done' if restored_at | length > 0
+               else ('progress' if eda_connected | bool else 'next') }}
+          restored_now: "{{ restored_now | bool }}"
+          restored_at: "{{ restored_at }}"
+      vars:
+        restored_now: >-
+          {{ current_deployment.resources | length > 0
+             and (current_deployment.resources[0].status.availableReplicas
+                  | default(0) | int) == 0 }}
+        previous_restored_at: >-
+          {{ (previous_receipt.resources | first | default({}))
+             .get('metadata', {}).get('annotations', {})
+             .get('receipt/eda-restored-at', '') }}
+        restored_at: >-
+          {{ receipt.deployed_at if restored_now | bool
+             else previous_restored_at }}
+        eda_connected: "{{ eda_route.resources | default([]) | length > 0 }}"
+
     # Route host = <launching user>.<apps domain>. The apps domain is taken from the
     # API URL that the credential injects (https://api.<cluster> -> apps.<cluster>).
     - name: Work out the Route host
@@ -83,6 +137,8 @@
             namespace: "{{ app_namespace }}"
             labels:
               app: "{{ app_name }}"
+            annotations:
+              receipt/eda-restored-at: "{{ progress.restored_at }}"
           data:
             index.html: "{{ receipt_html }}"
 

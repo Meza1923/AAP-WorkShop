@@ -78,6 +78,8 @@ Why: the playbook creates a ConfigMap, a Deployment, a Service and a Route in yo
 
 The job also creates an alert rule that fires when your app is down. You don't need it now; you use it in Activity 3.
 
+At the bottom of the page, the workshop journey shows your progress. It updates on each run of this job template as you finish the next activities.
+
 ### Step 6: Where did these values come from?
 
 You set none of the job details on the page. AAP passed them to the playbook.

@@ -6,3 +6,7 @@ metadata:
 data:
   config.yaml: |
     enableUserWorkload: true
+    alertmanagerMain:
+      enabled: true
+      enableUserAlertmanagerConfig: true
+      logLevel: debug

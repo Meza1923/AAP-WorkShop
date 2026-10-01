@@ -69,10 +69,10 @@ controller_job_templates:  # noqa: var-naming[no-role-prefix]
     state: present  # present = create or update (default), absent = delete
     organization: Default
     description: Applies the Activity 2 CaC configuration. Managed by CaC.
-    inventory: cac-image
+    inventory: cactest-ocp-inventory
     project: cactest-nginx-project
     playbook: activities/activity02/aap_config_as_code/deploy_main.yaml
-    execution_environment: Default execution environment
+    execution_environment: cac-image
     credentials:
       - aap
 

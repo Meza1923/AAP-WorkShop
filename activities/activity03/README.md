@@ -306,7 +306,7 @@ Then watch:
 2. After about 1 minute, the alert `AutomationReceiptDown` fires. You can see it in the OpenShift console under **Observe**.
 3. A few seconds later, the event appears in your activation output.
 4. A new `<username>-ocp-template` job runs.
-5. The deployment is back at 1 pod, and the receipt shows the new job number.
+5. The deployment is back at 1 pod, and the receipt shows the new job number, a green note that this run brought the app back, and **Event-Driven Ansible** marked as done.
 
 Why: this is the full loop, with no person involved between the outage and the fix.
 

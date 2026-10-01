@@ -14,6 +14,8 @@
   h1 { font-size: 1.6rem; margin: 0 0 4px; }
   .sub { color: var(--muted); margin: 0 0 24px; }
   .job { color: var(--accent); }
+  .banner { margin: 0 0 20px; padding: 12px 16px; border-radius: 10px; border: 1px solid var(--done);
+            background: rgba(63, 185, 80, 0.12); }
   .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 12px; }
   .card { background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: 14px 16px; }
   .label { color: var(--muted); font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.06em; }
@@ -21,8 +23,11 @@
   .journey { display: flex; gap: 8px; margin-top: 24px; flex-wrap: wrap; }
   .step { flex: 1 1 140px; padding: 10px 12px; border-radius: 8px; border: 1px solid var(--line);
           background: var(--card); font-size: 0.9rem; color: var(--muted); }
+  .step small { display: block; margin-top: 4px; font-size: 0.75rem; color: var(--muted); }
   .step.done { border-color: var(--done); color: var(--text); }
   .step.done::before { content: "\2713  "; color: var(--done); }
+  .step.progress { border-color: var(--accent); color: var(--text); }
+  .step.progress::before { content: "\25D0  "; color: var(--accent); }
   .step.next::before { content: "\2192  "; color: var(--muted); }
 </style>
 </head>
@@ -30,6 +35,9 @@
 <main>
   <h1>Automation Receipt</h1>
   <p class="sub">Deployed by AAP job <span class="job">#{{ receipt.job_id | e }}</span></p>
+{% if progress.restored_now | bool %}
+  <p class="banner">This run brought the app back after it went down.</p>
+{% endif %}
   <div class="grid">
     <div class="card"><div class="label">Job template</div><div class="value">{{ receipt.job_template | e }}</div></div>
     <div class="card"><div class="label">Launched by</div><div class="value">{{ receipt.user | e }} ({{ receipt.launch_type | e }})</div></div>
@@ -38,10 +46,10 @@
     <div class="card"><div class="label">Deployed at</div><div class="value">{{ receipt.deployed_at | e }}</div></div>
   </div>
   <div class="journey">
-    <div class="step done">VM deployed</div>
-    <div class="step done">OpenShift deployed</div>
-    <div class="step next">CaC</div>
-    <div class="step next">EDA</div>
+    <div class="step done">VM</div>
+    <div class="step done">OpenShift</div>
+    <div class="step {{ progress.cac | e }}">Configuration as Code{% if progress.cac == 'done' %}<small>managed from Git</small>{% endif %}</div>
+    <div class="step {{ progress.eda | e }}">Event-Driven Ansible{% if progress.eda == 'done' %}<small>restored {{ progress.restored_at | e }}</small>{% elif progress.eda == 'progress' %}<small>alerts connected</small>{% endif %}</div>
   </div>
 </main>
 </body>
