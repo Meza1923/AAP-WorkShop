@@ -1,6 +1,6 @@
 ---
-# Test data: the Activity 1 Part B objects in organization Default.
-# Part B reuses the Part A project, so this is the only project.
+# Test data: one project, the workshop repository. Every activity playbook
+# lives in it, so all job templates below use it.
 controller_projects:  # noqa: var-naming[no-role-prefix]
   - name: cactest-nginx-project
     state: present  # present = create or update (default), absent = delete

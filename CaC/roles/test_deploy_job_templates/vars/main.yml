@@ -1,7 +1,34 @@
 ---
-# Test data: the Activity 1 Part B job template. cactest-ocp-credential
-# (OpenShift or Kubernetes API Bearer Token) must exist; CaC never creates it.
+# Test data: one job template per activity playbook, with real lab values as
+# survey defaults. Credentials must exist already; CaC never creates them.
 controller_job_templates:  # noqa: var-naming[no-role-prefix]
+  # Activity 1 Part A
+  - name: cactest-nginx-template
+    state: present  # present = create or update (default), absent = delete
+    organization: Default
+    description: Deploys nginx on my VM. Managed by CaC.
+    inventory: cactest-nginx-inventory
+    project: cactest-nginx-project
+    playbook: activities/activity01/webapp-vm/nginx.yml
+    execution_environment: Default execution environment
+    credentials:
+      - aws-bastion
+    become_enabled: true
+    survey_enabled: true
+    survey_spec:
+      name: ""
+      description: ""
+      spec:
+        - question_name: Page title
+          question_description: Title shown on the nginx page
+          required: true
+          type: text
+          variable: page_title
+          min: 0
+          max: 1024
+          default: Hello from the CaC test
+
+  # Activity 1 Part B
   - name: cactest-ocp-template
     state: present  # present = create or update (default), absent = delete
     organization: Default
@@ -12,6 +39,8 @@ controller_job_templates:  # noqa: var-naming[no-role-prefix]
     execution_environment: Default execution environment
     credentials:
       - cactest-ocp-credential
+    extra_vars:
+      managed_by: cac
     survey_enabled: true
     survey_spec:
       name: ""
@@ -24,7 +53,7 @@ controller_job_templates:  # noqa: var-naming[no-role-prefix]
           variable: AAP_NAMESPACE
           min: 0
           max: 1024
-          default: ""
+          default: nginx-test-app
         - question_name: Webapp image
           question_description: The container image that serves the page
           required: false
@@ -33,6 +62,22 @@ controller_job_templates:  # noqa: var-naming[no-role-prefix]
           min: 0
           max: 1024
           default: docker.io/nginxinc/nginx-unprivileged:latest
+
+  # Activity 2: the participant CaC playbook. Run as-is it stops at the
+  # placeholder check, because the participant vars files hold placeholders.
+  - name: cactest-cac-template
+    state: present  # present = create or update (default), absent = delete
+    organization: Default
+    description: Applies the Activity 2 CaC configuration. Managed by CaC.
+    inventory: cac-image
+    project: cactest-nginx-project
+    playbook: activities/activity02/aap_config_as_code/deploy_main.yaml
+    execution_environment: Default execution environment
+    credentials:
+      - aap
+
+  # Activity 3. The token is the only answer to type: it is a secret and
+  # must not be stored in this public repository.
   - name: admin-connect-alertmanager
     state: present  # present = create or update (default), absent = delete
     organization: Default
@@ -55,7 +100,7 @@ controller_job_templates:  # noqa: var-naming[no-role-prefix]
           variable: AAP_NAMESPACE
           min: 0
           max: 1024
-          default: ""
+          default: nginx-test-app
         - question_name: Event stream URL
           question_description: The URL shown on your event stream in AAP
           required: true
@@ -63,7 +108,8 @@ controller_job_templates:  # noqa: var-naming[no-role-prefix]
           variable: event_stream_url
           min: 0
           max: 1024
-          default: ""
+          # yamllint disable-line rule:line-length
+          default: https://aap-aap.apps.cluster-vc4zx.vc4zx.sandbox2372.opentlc.com/eda-event-streams/api/eda/v1/external_event_stream/67617d5b-c42e-43aa-850b-4ca0cc66a341/post/
         - question_name: Event stream token
           question_description: The token in your Token Event Stream credential
           required: true

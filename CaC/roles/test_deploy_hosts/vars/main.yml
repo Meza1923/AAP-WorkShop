@@ -1,7 +1,12 @@
 ---
-# Test data: Part B runs on localhost; the namespace comes from the survey,
-# so the host has no variables.
+# 192.0.2.10 stands in for the workshop VM: no VM exists yet. Replace it with
+# the real VM address to run Part A. localhost needs no variables.
 controller_hosts:  # noqa: var-naming[no-role-prefix]
+  - name: bastion.vc4zx.sandbox2372.opentlc.com
+    state: present  # present = create or update (default), absent = delete
+    inventory: cactest-nginx-inventory
+    variables:
+      nginx_port: 8080
   - name: localhost
     state: present  # present = create or update (default), absent = delete
     inventory: cactest-ocp-inventory
