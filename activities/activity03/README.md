@@ -113,7 +113,7 @@ Expected result: the activation status changes to **Running** within a minute or
 
 ### Step 3: Send the sample alert and read the event (15 min)
 
-`activities/activity03/sample-alert.json` is an alert exactly as Alertmanager would send it. Send it to your event stream. Replace `<event-stream-url>` and `<token>` with your values.
+`activities/activity03/sample-alert.json` is an alert exactly as Alertmanager would send it. Send it to your event stream. Run the command from the root folder of your clone (the folder that contains `activities`), and replace `<event-stream-url>` and `<token>` with your values.
 
 Bash:
 
@@ -324,6 +324,7 @@ Expected result: the app is back within a few minutes, without you launching any
 - **401 or 403 when sending the sample:** the token in your command must match the token in `<username>-event-stream-credential`, and the header must be `Authorization: Bearer <token>`. Check that the event stream uses the **Token Event Stream** credential.
 - **No event in the activation output:** check the URL in your command against the URL of `<username>-alerts`. Check that the activation maps the source `alertmanager` to `<username>-alerts`, and that test mode is off on the event stream.
 - **Only `Print every event` ever fires:** the activation still runs your old rulebook. EDA works from its last project sync, not from GitHub. Sync `<username>-eda-project`, then restart `<username>-remediation`.
+- **The event shows `'payload': {'body': None}`:** the request arrived empty. curl couldn't find the file: run the command from the root folder of your clone. curl only prints a warning in this case and still gets `200 OK`.
 - **Condition never matches:** compare your field path with the printed event: `event.payload.commonLabels.alertname`. Check that `Print every event` is still the first rule and `match_multiple_rules: true` is still there. If you changed the `sources` section, the mapping was dropped: edit the activation and map the source again.
 - **Job not launched:** the activation output shows the error. Check `<username>-eda-aap-credential`: the URL must end with `/api/controller/`. Check that `name` and `organization` in your action match `<username>-ocp-template` and `<organization>` exactly, including upper and lower case (`Default` is not `default`). If the error mentions `variables_needed_to_start`, the action does not pass `AAP_NAMESPACE`, or misspells it.
 - **Alert not firing:** the alert waits 1 minute before it fires. Check the deployment really shows 0 pods, and look for `AutomationReceiptDown` under **Observe** in the OpenShift console.
