@@ -57,7 +57,6 @@ For each step: what to do, why it matters (one or two sentences), expected resul
 6. Recap: each AAP object and its purpose.
 
 ---
-
 ## Part B: webapp-openshift
 
 ### Learning design (must be preserved)
@@ -70,10 +69,14 @@ Part B must not repeat Part A. It teaches three new things:
 3. AAP-provided variables. AAP automatically passes job metadata to every playbook
    (e.g. job ID, job template name, launching user, launch type, project revision).
    Participants set none of these; the webapp displays them.
-Reinforcement of Part A: the namespace describes where the app lives, so participants set
-it as a HOST variable (`app_namespace`) on `localhost` in their inventory. The README
-tells them this directly, with a reference back to the Part A lesson. It is not a
-discovery exercise this time.
+Namespace: participants enter it at launch through a SURVEY question with answer
+variable `AAP_NAMESPACE` (Text, required). The playbook maps it to `app_namespace`
+internally. The inventory holds only `localhost`, with no host variables.
+Image: a second survey question, `WEBAPP_IMAGE` (Text, NOT required, default
+`docker.io/nginxinc/nginx-unprivileged:latest`). The README gives the image. It must not be
+required: API launches (EDA in Activity 3) get the default only for optional questions.
+Preparation for Activity 3: the playbook also deploys an alert rule that fires when the
+webapp has zero available replicas. Participants do nothing with it in Activity 1.
 
 ### The webapp: "Automation Receipt"
 A single static page, dark dashboard style, visually polished, little content. It shows:
@@ -96,26 +99,38 @@ Rules:
 - Use `kubernetes.core` modules. Confirm the collection exists in {EE_NAME}.
 - Authenticate only through the AAP OpenShift/Kubernetes credential (it injects the API
   host and token as environment variables). Never put the API URL or token in the repo.
-- First task: assert `app_namespace` is defined, with a clear message pointing to the README.
-- Read AAP job metadata variables (verify exact names against official AAP docs). Give
-  each a fallback such as "not run from AAP" so the playbook still works outside AAP.
+- First task: assert `AAP_NAMESPACE` is defined, with a clear message pointing to the survey
+  step in the README.
+- Read AAP job metadata variables (verify exact names against official AAP 2.7 docs).
+  Give each a fallback such as "not run from AAP" so the playbook still works outside AAP.
   (Fallbacks are allowed here; the no-defaults rule applies only to Part A's variables
-  and `app_namespace`.)
+  and `AAP_NAMESPACE`.)
 - Deployment time comes from the time the playbook runs, not gathered facts.
 - Resources, all in `app_namespace`, all with fixed names and a consistent label
-  (e.g. `app: automation-receipt`), because Activity 3 will target this deployment:
+  (e.g. `app: automation-receipt`), because Activity 3 depends on them:
   1. ConfigMap containing the rendered index.html
-  2. Deployment using {WEBAPP_IMAGE}, mounting the ConfigMap at {WEBAPP_HTML_PATH},
-     port 8080, 1 replica, small CPU/memory requests and limits, readiness and liveness probes
+  2. Deployment named `automation-receipt` using the `WEBAPP_IMAGE` survey answer, mounting
+     the ConfigMap at `/usr/share/nginx/html`, port 8080, 1 replica, small CPU/memory requests and limits,
+     readiness and liveness probes
   3. Service on port 8080
   4. Route with edge TLS
+  5. PrometheusRule named `automation-receipt-alerts` with one alert,
+     `AutomationReceiptDown`:
+     - fires when the `automation-receipt` deployment in `app_namespace` has zero
+       available replicas (kube-state-metrics, e.g. `kube_deployment_status_replicas_available`)
+     - `for: 1m`, so the Activity 3 demo doesn't take long
+     - labels: `severity: warning`, `app: automation-receipt`
+     - annotations: a short summary and description naming the namespace and deployment
+     - must be evaluated where kube-state-metrics are visible: do NOT restrict it to
+       the `leaf-prometheus` evaluation scope
 - Add a checksum of the ConfigMap content as a pod template annotation so a new receipt
   triggers a rollout.
 - Wait for the rollout to complete, verify the Route URL responds with the uri module,
   then print the URL.
 - Idempotency note: the receipt contains the job ID, so every run legitimately changes
   the ConfigMap. This is expected; the README explains it (see step 7 below).
-- Do NOT create alert rules, monitoring config, or anything for Activity 3.
+- Do NOT create Alertmanager routing, receivers, webhooks, or any EDA-related objects.
+  Only the PrometheusRule is in scope for Activity 1.
 
 ### README requirements
 Same style as Part A. Estimated time: 45-60 minutes.
@@ -124,17 +139,20 @@ Same style as Part A. Estimated time: 45-60 minutes.
 3. Steps:
    1. Create an "OpenShift or Kubernetes API Bearer Token" credential with the API URL
       and token. Explain why this replaces the SSH key.
-   2. Create a new inventory with host `localhost` and host variable `app_namespace`.
-      Reference the Part A lesson: the namespace describes the target, so it belongs here.
+   2. Create a new inventory with host `localhost` and no host variables.
    3. Reuse the project from Part A. Sync it and confirm the new playbook is available.
    4. Create a job template: new inventory, SAME project, the Part B playbook, and only
-      the OpenShift credential. Point out that no Machine credential is needed.
-   5. Run it, open the Route URL, and view your Automation Receipt.
+      the OpenShift credential. Point out that no Machine credential is needed. Add and
+      enable a survey with two Text questions: `AAP_NAMESPACE` (required, no default) and
+      `WEBAPP_IMAGE` (optional, default `docker.io/nginxinc/nginx-unprivileged:latest`).
+   5. Run it, open the Route URL, and view your Automation Receipt. Mention in one
+      sentence that the job also created an alert rule, which is used in Activity 3.
    6. "Where did these values come from?": a table mapping each value on the page to its
-      source (AAP automatically vs. your inventory).
+      source (AAP automatically vs. your survey answer).
    7. Run again. The job ID on the receipt changes, and the job reports changes. Explain
       why this doesn't contradict Part A: idempotency means no change when the desired
       state is the same, and here the desired state includes the job ID.
 4. Troubleshooting: invalid or expired token; TLS/certificate errors; "forbidden" errors
-   from a wrong namespace; pod not starting (image or permission issue); Route not reachable.
+   from a wrong namespace; "forbidden" when creating the alert rule (missing monitoring
+   permissions); pod not starting (image or permission issue); Route not reachable.
 5. Recap: comparison table of Part A vs Part B (target, credential type, inventory, variables).

@@ -1,0 +1,42 @@
+{
+  "receiver": "<namespace>/automation-receipt-eda/eda-event-stream",
+  "status": "firing",
+  "alerts": [
+    {
+      "status": "firing",
+      "labels": {
+        "alertname": "AutomationReceiptDown",
+        "app": "automation-receipt",
+        "deployment": "automation-receipt",
+        "namespace": "<namespace>",
+        "severity": "warning"
+      },
+      "annotations": {
+        "summary": "Automation Receipt is down in <namespace>",
+        "description": "Deployment automation-receipt in namespace <namespace> has had zero available replicas for 1 minute."
+      },
+      "startsAt": "2026-10-01T09:15:00.000Z",
+      "endsAt": "0001-01-01T00:00:00Z",
+      "generatorURL": "https://thanos-querier.example.com/graph?g0.expr=kube_deployment_status_replicas_available%3D%3D0",
+      "fingerprint": "3f2a9c1d7b4e6a80"
+    }
+  ],
+  "groupLabels": {
+    "alertname": "AutomationReceiptDown"
+  },
+  "commonLabels": {
+    "alertname": "AutomationReceiptDown",
+    "app": "automation-receipt",
+    "deployment": "automation-receipt",
+    "namespace": "<namespace>",
+    "severity": "warning"
+  },
+  "commonAnnotations": {
+    "summary": "Automation Receipt is down in <namespace>",
+    "description": "Deployment automation-receipt in namespace <namespace> has had zero available replicas for 1 minute."
+  },
+  "externalURL": "https://alertmanager-user-workload.example.com",
+  "version": "4",
+  "groupKey": "{}/{namespace=\"<namespace>\"}:{alertname=\"AutomationReceiptDown\"}",
+  "truncatedAlerts": 0
+}

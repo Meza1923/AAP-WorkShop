@@ -51,7 +51,7 @@ TODO: decide which registry the workshop uses and replace `<registry>`.
 
 ## 3. Register it in AAP
 
-Create an execution environment (TODO: verify menu path):
+Create an execution environment:
 
 - Name: `CaC execution environment` (the Activity 2 README uses this exact name)
 - Image: `<registry>/cac-ee:1.0`

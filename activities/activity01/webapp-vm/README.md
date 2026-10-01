@@ -29,21 +29,21 @@ Everyone shares this AAP, so start every object name with your username:
 
 ### Step 1: Machine credential
 
-Create a **Machine** credential named `<username>-nginx-credential`. Username `lab-user`, paste in the SSH private key. (TODO: verify menu path)
+Create a **Machine** credential named `<username>-nginx-credential`. Username `lab-user`, paste in the SSH private key.
 
 Why: the key lives encrypted in AAP. It never goes in a playbook, an inventory or Git.
 
 
 ### Step 2: Inventory and host
 
-Create `<username>-nginx-inventory` and add your VM as a host, using `<vm-address>` as the host name. (TODO: verify menu path)
+Create `<username>-nginx-inventory` and add your VM as a host, using `<vm-address>` as the host name.
 
 Why: the inventory is the list of machines AAP is allowed to touch.
 
 
 ### Step 3: Project
 
-Create `<username>-nginx-project` (source control type Git) with the repo URL from section 2. Save it and let it sync. (TODO: verify menu path)
+Create `<username>-nginx-project` (source control type Git) with the repo URL from section 2. Save it and let it sync.
 
 Why: this is how playbooks get from Git into AAP.
 
@@ -95,7 +95,7 @@ Open your inventory, open the host, and put this in its **Variables** field:
 nginx_port: 8080
 ```
 
-Save. (TODO: verify menu path)
+Save.
 
 </details>
 
@@ -126,7 +126,7 @@ On your job template, add a survey with one question:
 - Type: Text
 - Required: yes
 
-Then make sure the survey is **enabled**. A survey that isn't enabled never shows up. (TODO: verify menu path)
+Then make sure the survey is **enabled**. A survey that isn't enabled never shows up.
 
 </details>
 

@@ -4,10 +4,8 @@
 
 In Activity 1 you built your AAP objects by hand. Now you describe them in Git, and every push makes AAP match that description. That keeps AAP consistent with Git, gives you an audit trail of every change, and lets you restore a deleted object with one job run.
 
-Time: about 110 minutes.
-
-> [!WARNING]
-> Your fork is public. Never commit passwords, SSH keys, tokens or any other secret to it. Anyone on the internet can read it, including its full history, so a secret that was committed once stays exposed even after you delete it.
+> [!NOTE]
+> Your fork is public, so keep passwords, keys and tokens out of it. Git also keeps old commits, so deleting a secret later doesn't really remove it.
 
 ## 2. What you need
 
@@ -73,11 +71,11 @@ Each role separates logic from data:
 | `roles/deploy_hosts/vars/main.yml` | Hosts: name, the inventory they belong to, and their host variables. |
 | `roles/deploy_job_templates/vars/main.yml` | Job templates: inventory, project, playbook, execution environment, credentials, privilege escalation and survey. |
 
-Each `vars/main.yml` contains one example, modeled on your Part A objects. Values in angle brackets, like `<username>`, are placeholders you replace in step 4. Every entry also has a `state` line: `present` creates or updates the object, `absent` deletes it (see step 5). Don't rename the top-level names (`controller_projects`, `controller_inventories`, `controller_hosts`, `controller_job_templates`): the task files loop over exactly these names.
+Each `vars/main.yml` contains one example, modeled on your Part A objects. Values in angle brackets, like `<username>`, are placeholders you replace in step 4. Every entry also has a `state` line: `present` creates or updates the object, `absent` deletes it (see "Optional: delete an object through Git" after step 8). Don't rename the top-level names (`controller_projects`, `controller_inventories`, `controller_hosts`, `controller_job_templates`): the task files loop over exactly these names.
 
 There is no role for credentials. Credentials stay in AAP, and job templates refer to them by name only.
 
-Expected result: your fork exists on GitHub, and you have the four `vars/main.yml` files open in front of you.
+Expected result: your fork exists on GitHub, you have looked at the four rules.
 
 ### Step 2: Create the bootstrap objects (20 min)
 
@@ -85,7 +83,7 @@ CaC needs a way in before it can manage anything: a login for AAP, a project tha
 
 #### 2a. AAP credential
 
-Create a credential of type **Red Hat Ansible Automation Platform** named `<username>-aap-credential` (TODO: verify menu path):
+Create a credential of type **Red Hat Ansible Automation Platform** named `<username>-aap-credential`:
 
 - **Red Hat Ansible Automation Platform**: `<aap-url>`
 - **Username** and **Password**: your AAP login
@@ -95,7 +93,7 @@ Why: AAP hands this credential to the CaC job at run time, so the URL and passwo
 
 #### 2b. CaC project
 
-Create `<username>-cac-project` (TODO: verify menu path):
+Create `<username>-cac-project`:
 
 - Organization: `<organization>`
 - **Source control type**: Git
@@ -110,7 +108,7 @@ Your Part A project, `<username>-nginx-project`, stays as it is and keeps pointi
 
 #### 2c. CaC job template
 
-Create `<username>-cac-template` (TODO: verify menu path):
+Create `<username>-cac-template`:
 
 - Inventory: `<username>-ocp-inventory` (your Part B inventory; the CaC playbook also runs on `localhost`)
 - Project: `<username>-cac-project`
@@ -184,34 +182,20 @@ Launch `<username>-nginx-template` once to confirm it still works.
 
 ### Step 5: Add Part B (20 min)
 
-Now describe your Part B objects. Copy each example entry, paste it below the existing one in the same file, and change the values. Part B needs:
+Same idea as step 4, for your Part B objects. In each file below, copy the example entry, paste it under the existing one with the same indentation, and change it:
 
-- `roles/deploy_inventories/vars/main.yml`: `<username>-ocp-inventory`.
-- `roles/deploy_hosts/vars/main.yml`: host `localhost` in `<username>-ocp-inventory`, with the host variable `app_namespace` set to your namespace.
-- `roles/deploy_job_templates/vars/main.yml`: `<username>-ocp-template`, with the Part B inventory, the SAME project as Part A, the playbook `activities/activity01/webapp-openshift/receipt.yml`, and only `<username>-ocp-credential`. Remove the `become_enabled`, `survey_enabled` and `survey_spec` lines: Part B has no survey and needs no privilege escalation.
-- `roles/deploy_projects/vars/main.yml`: nothing to add. Part B reuses the Part A project.
+| File | What to change in the copy |
+|---|---|
+| `roles/deploy_inventories/vars/main.yml` | name `<username>-ocp-inventory` |
+| `roles/deploy_hosts/vars/main.yml` | name `localhost`, inventory `<username>-ocp-inventory`, and delete the `variables` lines |
+| `roles/deploy_job_templates/vars/main.yml` | name `<username>-ocp-template`, a description for Part B, inventory `<username>-ocp-inventory`, playbook `activities/activity01/webapp-openshift/receipt.yml`, credential `<username>-ocp-credential`, delete the `become_enabled` line, and make the survey ask `AAP_NAMESPACE` and `WEBAPP_IMAGE` |
 
-Keep the indentation: each new entry starts with `  - name:`, aligned with the example above it.
-
-If you leave out a field such as a survey, CaC doesn't change it. It only sets the fields you write down.
-
-To delete an object through Git, keep its entry and change its `state` to `absent`. A delete entry needs only the name and the organization (for a host: the name and the inventory):
-
-```yaml
-  - name: <username>-old-template
-    state: absent
-    organization: <organization>
-```
-
-Removing an entry from the file does NOT delete the object. CaC only deletes what you explicitly mark, so the deletion shows up in your commit history like any other change. Two things to watch:
-
-- Deleting an inventory also deletes its hosts. Remove those hosts' entries from `roles/deploy_hosts/vars/main.yml` in the same commit, or the next run fails looking for the inventory.
-- Never mark `<username>-ocp-inventory` as absent. Your CaC job template runs with it.
+There is no new project: Part B uses `<username>-nginx-project`, which is already in the file. Keep the survey in Git, because in step 7 CaC rebuilds the template from it.
 
 <details>
-<summary>Solution</summary>
+<summary>Check your entries</summary>
 
-Add to `roles/deploy_inventories/vars/main.yml`:
+`roles/deploy_inventories/vars/main.yml`:
 
 ```yaml
   - name: <username>-ocp-inventory
@@ -219,17 +203,15 @@ Add to `roles/deploy_inventories/vars/main.yml`:
     organization: <organization>
 ```
 
-Add to `roles/deploy_hosts/vars/main.yml`:
+`roles/deploy_hosts/vars/main.yml`:
 
 ```yaml
   - name: localhost
     state: present
     inventory: <username>-ocp-inventory
-    variables:
-      app_namespace: <namespace>
 ```
 
-Add to `roles/deploy_job_templates/vars/main.yml`:
+`roles/deploy_job_templates/vars/main.yml`:
 
 ```yaml
   - name: <username>-ocp-template
@@ -242,9 +224,28 @@ Add to `roles/deploy_job_templates/vars/main.yml`:
     execution_environment: Default execution environment
     credentials:
       - <username>-ocp-credential
+    survey_enabled: true
+    survey_spec:
+      name: ""
+      description: ""
+      spec:
+        - question_name: Namespace
+          question_description: The OpenShift namespace to deploy to
+          required: true
+          type: text
+          variable: AAP_NAMESPACE
+          min: 0
+          max: 1024
+          default: ""
+        - question_name: Webapp image
+          question_description: The container image that serves the page
+          required: false
+          type: text
+          variable: WEBAPP_IMAGE
+          min: 0
+          max: 1024
+          default: docker.io/nginxinc/nginx-unprivileged:latest
 ```
-
-Replace the placeholders with your own values, as in step 4.
 
 </details>
 
@@ -266,7 +267,7 @@ Expected result: the description is back to `Deploys nginx on my VM. Managed by 
 
 Delete `<username>-ocp-template` in AAP. Then launch `<username>-cac-template` and wait for it to finish.
 
-Open the template list: `<username>-ocp-template` is back. Launch it, and when it finishes, open your Route URL.
+Open the template list: `<username>-ocp-template` is back. Launch it, enter your namespace in the survey, and when it finishes, open your Route URL.
 
 Why: Git holds the full description of the template, so CaC can rebuild it from scratch.
 
@@ -285,6 +286,25 @@ git log --oneline -- roles/
 Every change to your AAP objects is a commit: who made it, when, and exactly which lines changed. Each CaC job also records which commit it applied (**Project revision used by this job**), so you can match any job to a commit.
 
 Your manual change from step 6 appears nowhere in Git. Changes made in the UI leave no trace there, which is one more reason to make changes through Git.
+
+### Optional: delete an object through Git
+
+You don't need this for the steps above. It shows how to remove an object the CaC way.
+
+Find the object's entry in its `vars/main.yml` file and change `state: present` to `state: absent`. Then commit and push. The next CaC run deletes the object, and the deletion is in your commit history like any other change. For example, to delete a job template named `<username>-old-template`:
+
+```yaml
+  - name: <username>-old-template
+    state: absent
+    organization: <organization>
+```
+
+Simply removing an entry from the file does not delete anything: CaC leaves objects it doesn't know about alone.
+
+Two things to watch:
+
+- Deleting an inventory also deletes its hosts. Remove those hosts' entries from `roles/deploy_hosts/vars/main.yml` in the same commit, or the next run fails looking for the inventory.
+- Don't delete `<username>-ocp-inventory`: your CaC job template runs with it.
 
 ## 5. Troubleshooting
 

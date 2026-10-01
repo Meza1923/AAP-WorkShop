@@ -1,8 +1,6 @@
 ---
-# Logic only: create, update or delete the inventories in vars/main.yml.
-# Fields left out of an entry are not changed in AAP.
-# An entry with "state: absent" deletes that object. Objects missing
-# from vars/main.yml are never deleted.
+# Creates, updates or deletes (state: absent) the entries in vars/main.yml.
+# Unlisted objects and unlisted fields are left unchanged in AAP.
 - name: Ensure AAP inventories are configured
   ansible.controller.inventory:
     name: "{{ item.name }}"

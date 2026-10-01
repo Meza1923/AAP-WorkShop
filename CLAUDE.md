@@ -24,13 +24,16 @@ All activities build on the same scenario, so each one continues the previous:
 - nginx port is always 8080 (already allowed by SELinux on RHEL; no SELinux handling needed).
 - OpenShift API URL: {OCP_API_URL}
 - OpenShift version: {OCP_VERSION}
-- Webapp container image (non-root, listens on 8080): {WEBAPP_IMAGE}
-- HTML directory served by that image: {WEBAPP_HTML_PATH}
+- Webapp container image (non-root, listens on 8080): `docker.io/nginxinc/nginx-unprivileged:latest`.
+  Participants supply it through the Part B survey (`WEBAPP_IMAGE`, optional, this as default).
+- HTML directory served by that image: `/usr/share/nginx/html`
 - Every participant has their own OpenShift namespace and a service account with
   edit rights limited to that namespace. Participants receive the namespace name and token.
 - AAP public URL (reachable from the internet, used for GitHub webhooks): {AAP_URL}
 - In Activity 2, participants fork {GIT_URL} into their own GitHub account.
   Forks are public: nothing secret may ever be committed.
+- OpenShift user workload monitoring is enabled, including the user workload
+  Alertmanager with user-defined alert routing (`AlertmanagerConfig`) allowed.
 
 ## Repository layout
 Repo root: `/root/github/AAP-WorkShop`
@@ -48,6 +51,10 @@ Repo root: `/root/github/AAP-WorkShop`
   is allowed, e.g. to match the username format used in naming conventions.
 - `playbooks/`: the instructor's personal test area. Ignore it completely. Never put
   activity playbooks here; activity playbooks always live in their activity folder.
+- `{RULEBOOK_DIR}` (at the repo root, e.g. `extensions/eda/rulebooks/`): EDA rulebooks.
+  EDA projects only discover rulebooks in specific root folders, so this is the ONE
+  exception to the rule that activity content lives in its activity folder.
+  Only Activity 3 uses it.
 
 ## Activity folder conventions
 - Each activity folder contains: playbooks, supporting files (templates etc.), and a
@@ -80,7 +87,10 @@ Example of the right tone:
 
 ## Global rules
 - Never invent documentation URLs. If an exact link can't be confirmed, write `TODO: link to <topic> docs`.
-- Never guess AAP UI menu paths. If unsure, write `TODO: verify menu path`.
+- Never guess AAP UI menu paths. Name the object type and its fields instead; do not add
+  "verify menu path" notes, participants manage without them.
 - Only work inside the activity folder you were asked to work on.
 - Do not add content belonging to a later activity (e.g. no CaC in Activity 1).
 - At the end of every task, report: files created or changed, assumptions made, and all TODOs.
+- Only work inside the activity folder you were asked to work on (plus `{RULEBOOK_DIR}`
+  when working on Activity 3).

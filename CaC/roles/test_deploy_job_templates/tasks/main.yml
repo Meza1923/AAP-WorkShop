@@ -1,9 +1,6 @@
 ---
-# Logic only: create, update or delete the job templates in
-# vars/main.yml.
-# Fields left out of an entry are not changed in AAP.
-# An entry with "state: absent" deletes that object. Objects missing
-# from vars/main.yml are never deleted.
+# Creates, updates or deletes (state: absent) the entries in vars/main.yml.
+# Unlisted objects and unlisted fields are left unchanged in AAP.
 - name: Ensure AAP job templates are configured
   ansible.controller.job_template:
     name: "{{ item.name }}"

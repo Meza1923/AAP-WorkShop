@@ -1,9 +1,9 @@
 ---
-# Test data for the lab AAP. Real values: organization Default and the
-# workshop repository.
+# Test data: the Activity 1 Part B objects in organization Default.
+# Part B reuses the Part A project, so this is the only project.
 controller_projects:  # noqa: var-naming[no-role-prefix]
   - name: cactest-nginx-project
-    state: absent  # present = create or update (default), absent = delete
+    state: present  # present = create or update (default), absent = delete
     organization: Default
     scm_type: git
     scm_url: https://github.com/Meza1923/AAP-WorkShop.git

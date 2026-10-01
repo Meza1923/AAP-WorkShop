@@ -1,17 +1,6 @@
 ---
-# Activity 2: make AAP match the data in roles/*/vars/main.yml.
-#
-# Logic and data are separate: each role's tasks/main.yml loops over the list
-# in its vars/main.yml. To manage another object, add a block to a vars file;
-# the task files stay as they are.
-#
-# The job logs in with the credential attached to the job template, creates a
-# temporary token, runs every role with that token, and deletes the token at
-# the end, even if a role failed.
-#
-# Entries are created or updated by default. An entry with "state: absent"
-# deletes that object. Objects missing from the vars files are never
-# deleted, so credentials and the bootstrap objects are never touched.
+# Activity 2: make AAP match roles/*/vars/main.yml, using a temporary token.
+# Only "state: absent" entries are deleted; unlisted objects stay in AAP.
 - name: Configure Ansible Automation Platform
   hosts: localhost
   connection: local

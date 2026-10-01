@@ -1,9 +1,6 @@
 ---
-# Activity 1, Part A: deploy nginx on a RHEL9 VM.
-#
-# nginx_port and page_title are required and intentionally have NO defaults
-# anywhere in this repository. Do not add them to defaults, vars, group_vars
-# or host_vars: the exercise depends on them being missing on the first run.
+# Activity 1, Part A: deploy nginx on a RHEL9 VM. nginx_port and page_title
+# must have NO defaults anywhere: the first run is meant to fail without them.
 - name: Deploy nginx
   hosts: all
   become: true

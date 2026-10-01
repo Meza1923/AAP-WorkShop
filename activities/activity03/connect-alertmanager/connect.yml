@@ -1,0 +1,108 @@
+---
+# Activity 3: route AutomationReceiptDown alerts from your namespace to your
+# EDA event stream. Auth comes only from the attached OpenShift credential.
+- name: Connect Alertmanager to your event stream
+  hosts: localhost
+  connection: local
+  gather_facts: false
+  vars:
+    ansible_python_interpreter: "{{ ansible_playbook_python }}"
+    app_name: automation-receipt
+    app_namespace: "{{ AAP_NAMESPACE }}"
+    token_secret_name: automation-receipt-eda-token
+
+  tasks:
+    - name: Require AAP_NAMESPACE
+      ansible.builtin.assert:
+        that:
+          - AAP_NAMESPACE is defined
+          - AAP_NAMESPACE | string | length > 0
+        fail_msg: >-
+          Missing 'AAP_NAMESPACE'. Enter your namespace in the survey
+          (README, step 6).
+        quiet: true
+
+    - name: Require event_stream_url
+      ansible.builtin.assert:
+        that:
+          - event_stream_url is defined
+          - event_stream_url is match('^https?://')
+        fail_msg: >-
+          Missing or invalid 'event_stream_url'. Copy the URL from your event
+          stream in AAP into the survey (README, step 6).
+        quiet: true
+
+    # Evaluated with no_log so the token never appears; the assert below only
+    # sees true or false.
+    - name: Check that a token was entered
+      ansible.builtin.set_fact:
+        token_entered: "{{ event_stream_token | default('') | length > 0 }}"
+      no_log: true
+
+    - name: Require event_stream_token
+      ansible.builtin.assert:
+        that:
+          - token_entered | bool
+        fail_msg: >-
+          Missing 'event_stream_token'. Enter the token from your Token Event
+          Stream credential in the survey (README, step 6).
+        quiet: true
+
+    - name: Store the event stream token in a Secret
+      kubernetes.core.k8s:
+        state: present
+        definition:
+          apiVersion: v1
+          kind: Secret
+          metadata:
+            name: "{{ token_secret_name }}"
+            namespace: "{{ app_namespace }}"
+            labels:
+              app: "{{ app_name }}"
+          type: Opaque
+          data:
+            token: "{{ event_stream_token | b64encode }}"
+      no_log: true
+
+    # Sends "Authorization: Bearer <token>", the format the Token Event Stream
+    # credential accepts. Resolved alerts are not sent.
+    - name: Route the alert to the event stream
+      kubernetes.core.k8s:
+        state: present
+        definition:
+          apiVersion: monitoring.coreos.com/v1beta1
+          kind: AlertmanagerConfig
+          metadata:
+            name: "{{ app_name }}-eda"
+            namespace: "{{ app_namespace }}"
+            labels:
+              app: "{{ app_name }}"
+          spec:
+            route:
+              receiver: eda-event-stream
+              groupBy:
+                - alertname
+              groupWait: 10s
+              groupInterval: 1m
+              repeatInterval: 5m
+              matchers:
+                - name: alertname
+                  matchType: "="
+                  value: AutomationReceiptDown
+            receivers:
+              - name: eda-event-stream
+                webhookConfigs:
+                  - url: "{{ event_stream_url }}"
+                    sendResolved: false
+                    httpConfig:
+                      authorization:
+                        type: Bearer
+                        credentials:
+                          name: "{{ token_secret_name }}"
+                          key: token
+
+    - name: Show what was connected
+      ansible.builtin.debug:
+        msg: >-
+          AutomationReceiptDown alerts from namespace {{ app_namespace }} now go
+          to {{ event_stream_url }}.

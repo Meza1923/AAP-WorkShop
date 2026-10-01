@@ -1,7 +1,6 @@
 ---
-# Data only: the job templates that must exist in AAP.
-# Credentials are referenced by name only. They stay in AAP and never go in Git.
-# Names must match your existing AAP objects exactly, or CaC creates new ones.
+# Data only: the job templates in AAP. Credentials are referenced by name
+# only. Names must match AAP exactly, or CaC creates duplicates.
 controller_job_templates:  # noqa: var-naming[no-role-prefix]
   - name: <username>-nginx-template
     state: present  # present = create or update (default), absent = delete

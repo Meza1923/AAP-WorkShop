@@ -1,14 +1,6 @@
 ---
-# Instructor test of the Activity 2 CaC flow, with real data for the lab AAP
-# (organization Default, objects prefixed "cactest-"). Self-contained: this
-# folder has its own roles and controller_vars.yml and does not depend on
-# activities/activity02. The task files started as copies of the Activity 2
-# ones, plus a two-pass filter (cac_pass) so deletions run in reverse order.
-#
-# Before running, create the credential cactest-ocp-credential by hand (see
-# roles/test_deploy_job_templates/vars/main.yml). Run it from a job template
-# with playbook CaC/deploy_test.yaml, the Default execution environment and a
-# "Red Hat Ansible Automation Platform" credential.
+# Instructor test of the Activity 2 CaC flow with real lab data (cactest-*).
+# Self-contained; needs an AAP credential on the job template that runs it.
 - name: Configure Ansible Automation Platform (test data)
   hosts: localhost
   connection: local
@@ -39,9 +31,8 @@
 
     - name: Apply the test configuration
       block:
-        # Pass 1: delete the "state: absent" entries, users of an object
-        # first (job templates, hosts, inventories, projects). Deleting an
-        # inventory before its hosts would fail the host lookups.
+        # Pass 1: delete "state: absent" entries, dependents first, so hosts are
+        # gone before their inventory.
         - name: Start the delete pass
           ansible.builtin.set_fact:
             cac_pass: absent

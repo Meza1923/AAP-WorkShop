@@ -1,7 +1,5 @@
 ---
-# AAP connection settings. This file holds no secrets and no URL: the fork is
-# public. The "Red Hat Ansible Automation Platform" credential attached to the
-# job template injects aap_hostname, aap_username, aap_password and
-# aap_validate_certs at run time.
+# Connection settings, filled at run time from the AAP credential on the
+# job template. No URL or secrets here: the fork is public.
 controller_host: "{{ aap_hostname }}"
 controller_validate_certs: "{{ aap_validate_certs | default(true) }}"

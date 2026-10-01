@@ -20,8 +20,10 @@ Out of scope for this task: the DR session content. Do not write anything about 
     with the `page_title` survey. Values use obvious placeholders such as `<username>`.
     Participants replace the values to match their own Part A objects.
   - For Part B, participants copy the examples and adapt them: an inventory with
-    `localhost` and the `app_namespace` host variable, and a job template with no survey
-    that uses the OpenShift credential instead of the Machine credential.
+    `localhost` (no host variables), and a job template whose survey asks the namespace
+    (`AAP_NAMESPACE`, required) and the image (`WEBAPP_IMAGE`, optional, default
+    `docker.io/nginxinc/nginx-unprivileged:latest`), and that uses the OpenShift credential
+    instead of the Machine credential.
 - Object names in YAML must match the Activity 1 objects EXACTLY (including the username
   prefix). Otherwise CaC creates duplicates instead of managing the existing objects.
 - Drift test: participants change a managed field by hand in the UI, run CaC, and see it revert.

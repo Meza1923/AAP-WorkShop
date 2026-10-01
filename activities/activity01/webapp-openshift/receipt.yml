@@ -1,13 +1,6 @@
 ---
-# Activity 1, Part B: deploy the "Automation Receipt" webapp on OpenShift.
-#
-# Authentication comes only from the AAP OpenShift/Kubernetes credential, which
-# injects K8S_AUTH_HOST and K8S_AUTH_API_KEY (and friends) as environment
-# variables. kubernetes.core reads them by itself. Never put the API URL or the
-# token in this repository.
-#
-# app_namespace is required and intentionally has NO default anywhere in this
-# repository. Participants set it as a host variable on localhost.
+# Activity 1, Part B: deploy the Automation Receipt on OpenShift. Auth comes
+# only from the AAP credential; AAP_NAMESPACE has NO default (survey answer).
 - name: Deploy the Automation Receipt
   hosts: localhost
   connection: local
@@ -15,20 +8,29 @@
   vars:
     ansible_python_interpreter: "{{ ansible_playbook_python }}"
     app_name: automation-receipt
-    # TODO: set the workshop image before the workshop (see CLAUDE.md placeholders).
     webapp_image: "{{ WEBAPP_IMAGE }}"
     app_namespace: "{{ AAP_NAMESPACE }}"
     webapp_html_path: /usr/share/nginx/html
 
   tasks:
-    - name: Require app_namespace
+    - name: Require AAP_NAMESPACE
       ansible.builtin.assert:
         that:
-          - app_namespace is defined
-          - app_namespace | string | length > 0
+          - AAP_NAMESPACE is defined
+          - AAP_NAMESPACE | string | length > 0
         fail_msg: >-
-          Missing required variable 'app_namespace'.
-          See the README, step 2 (Create the inventory).
+          Missing required variable 'AAP_NAMESPACE'. It comes from the survey
+          on the job template. See the README, step 4 (Job template).
+        quiet: true
+
+    - name: Require WEBAPP_IMAGE
+      ansible.builtin.assert:
+        that:
+          - WEBAPP_IMAGE is defined
+          - WEBAPP_IMAGE | string | length > 0
+        fail_msg: >-
+          Missing required variable 'WEBAPP_IMAGE'. It comes from the survey
+          on the job template. See the README, step 4 (Job template).
         quiet: true
 
     # AAP passes job metadata as awx_* (tower_* are the older names of the same data).
@@ -182,6 +184,40 @@
               termination: edge
               insecureEdgeTerminationPolicy: Redirect
       register: route
+
+    # Used in Activity 3. No leaf-prometheus scope label: the rule needs the
+    # kube-state-metrics series, which only the platform Prometheus has.
+    - name: Deploy the alert rule
+      kubernetes.core.k8s:
+        state: present
+        definition:
+          apiVersion: monitoring.coreos.com/v1
+          kind: PrometheusRule
+          metadata:
+            name: "{{ app_name }}-alerts"
+            namespace: "{{ app_namespace }}"
+            labels:
+              app: "{{ app_name }}"
+          spec:
+            groups:
+              - name: "{{ app_name }}"
+                rules:
+                  - alert: AutomationReceiptDown
+                    expr: >-
+                      kube_deployment_status_replicas_available{
+                      namespace="{{ app_namespace }}",
+                      deployment="{{ app_name }}"} == 0
+                    for: 1m
+                    labels:
+                      severity: warning
+                      app: "{{ app_name }}"
+                    annotations:
+                      summary: >-
+                        Automation Receipt is down in {{ app_namespace }}
+                      description: >-
+                        Deployment {{ app_name }} in namespace
+                        {{ app_namespace }} has had zero available
+                        replicas for 1 minute.
 
     - name: Verify the Route responds
       ansible.builtin.uri:

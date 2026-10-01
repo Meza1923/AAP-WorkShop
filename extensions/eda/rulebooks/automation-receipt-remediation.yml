@@ -1,0 +1,31 @@
+---
+# Activity 3: restart the Automation Receipt when its alert fires.
+# yamllint disable rule:comments-indentation
+- name: Automation Receipt remediation
+  hosts: all
+  match_multiple_rules: true
+
+  # Replaced by your event stream when the activation starts.
+  sources:
+    - name: alertmanager
+      ansible.eda.webhook:
+        host: 0.0.0.0
+        port: 5000
+
+  rules:
+    - name: Print every event
+      condition: event.payload is defined
+      action:
+        debug:
+          var: event
+
+    # Step 4: remove the leading "# " from the lines of this rule (keep the
+    # indentation), then replace both TODO lines.
+    # - name: Restart the Automation Receipt
+    #   condition: TODO
+    #   throttle:
+    #     once_within: 5 minutes
+    #     group_by_attributes:
+    #       - event.payload.commonLabels.alertname
+    #   action:
+    #     TODO

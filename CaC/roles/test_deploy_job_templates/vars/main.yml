@@ -1,35 +1,9 @@
 ---
-# Test data for the lab AAP. "Demo Credential" (Machine) already exists.
-# cactest-ocp-credential must be created by hand before the run, like
-# participants create their credentials: type "OpenShift or Kubernetes API
-# Bearer Token", organization Default. CaC never creates credentials.
+# Test data: the Activity 1 Part B job template. cactest-ocp-credential
+# (OpenShift or Kubernetes API Bearer Token) must exist; CaC never creates it.
 controller_job_templates:  # noqa: var-naming[no-role-prefix]
-  - name: cactest-nginx-template
-    state: absent  # present = create or update (default), absent = delete
-    organization: Default
-    description: Deploys nginx on my VM. Managed by CaC.
-    inventory: cactest-nginx-inventory
-    project: cactest-nginx-project
-    playbook: activities/activity01/webapp-vm/nginx.yml
-    execution_environment: Default execution environment
-    credentials:
-      - Demo Credential
-    become_enabled: true
-    survey_enabled: true
-    survey_spec:
-      name: ""
-      description: ""
-      spec:
-        - question_name: Page title
-          question_description: Title shown on the nginx page
-          required: true
-          type: text
-          variable: page_title
-          min: 0
-          max: 1024
-          default: ""
   - name: cactest-ocp-template
-    state: absent  # present = create or update (default), absent = delete
+    state: present  # present = create or update (default), absent = delete
     organization: Default
     description: Deploys the Automation Receipt on OpenShift. Managed by CaC.
     inventory: cactest-ocp-inventory
@@ -38,8 +12,24 @@ controller_job_templates:  # noqa: var-naming[no-role-prefix]
     execution_environment: Default execution environment
     credentials:
       - cactest-ocp-credential
-  # Delete test: create a job template with this name by hand in organization
-  # Default, run the test, and it is gone. If it doesn't exist, nothing happens.
-  - name: cactest-delete-me-template
-    organization: Default
-    state: absent
+    survey_enabled: true
+    survey_spec:
+      name: ""
+      description: ""
+      spec:
+        - question_name: Namespace
+          question_description: The OpenShift namespace to deploy to
+          required: true
+          type: text
+          variable: AAP_NAMESPACE
+          min: 0
+          max: 1024
+          default: ""
+        - question_name: Webapp image
+          question_description: The container image that serves the page
+          required: false
+          type: text
+          variable: WEBAPP_IMAGE
+          min: 0
+          max: 1024
+          default: docker.io/nginxinc/nginx-unprivileged:latest

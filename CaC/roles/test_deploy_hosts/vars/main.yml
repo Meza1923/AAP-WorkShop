@@ -1,25 +1,7 @@
 ---
-# Test data for the lab AAP. 192.0.2.10 (a documentation address) and the
-# namespace "cactest" are stand-ins: no workshop VM or participant namespace
-# exists yet. CaC only records them in AAP; nothing connects to them.
+# Test data: Part B runs on localhost; the namespace comes from the survey,
+# so the host has no variables.
 controller_hosts:  # noqa: var-naming[no-role-prefix]
-  - name: 192.0.2.10
-    state: absent
-    inventory: cactest-nginx-inventory
-    variables:
-      nginx_port: 8080
   - name: localhost
-    state: absent  # present = create or update (default), absent = delete
+    state: present  # present = create or update (default), absent = delete
     inventory: cactest-ocp-inventory
-    variables:
-      app_namespace: cactest
-  - name: 1.1.1.1
-    state: absent  # present = create or update (default), absent = delete
-    inventory: cactest-nginx-inventory
-    variables:
-      nginx_port: 7777
-  - name: a.example.com
-    state: absent  # present = create or update (default), absent = delete
-    inventory: cactest-nginx-inventory
-    variables:
-      nginx_port: 77277
