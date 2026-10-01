@@ -30,7 +30,7 @@
       action:
         run_job_template:
           name: cactest-ocp-template
-          organization: default
+          organization: Default
           job_args:
             extra_vars:
               AAP_NAMESPACE: nginx-test-app
