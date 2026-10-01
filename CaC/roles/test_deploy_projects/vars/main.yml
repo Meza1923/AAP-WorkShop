@@ -8,3 +8,4 @@ controller_projects:  # noqa: var-naming[no-role-prefix]
     scm_type: git
     scm_url: https://github.com/Meza1923/AAP-WorkShop.git
     scm_branch: main
+    scm_update_on_launch: true  # every job uses the latest commit

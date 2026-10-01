@@ -199,10 +199,31 @@ Also add these two lines to the job template entry, under `credentials`. They te
 
 There is no new project: Part B uses `<username>-nginx-project`, which is already in the file. Keep the survey in Git, because in step 7 CaC rebuilds the template from it.
 
-<details>
-<summary>Check your entries</summary>
+Commit and push, the same way as in step 4.
 
-`roles/deploy_inventories/vars/main.yml`:
+Expected result: a new CaC job with status **Successful**, and `<username>-ocp-template` now has the description you set. Your Part B objects each exist once.
+
+Stuck? Open the solution for one object at a time. Replace the placeholders with your own values, as in step 4.
+
+<details>
+<summary>Solution: project</summary>
+
+`roles/deploy_projects/vars/main.yml`: nothing to add. Part B reuses this Part A entry:
+
+```yaml
+  - name: <username>-nginx-project
+    state: present
+    organization: <organization>
+    scm_type: git
+    scm_url: <git-repo-url>
+```
+
+</details>
+
+<details>
+<summary>Solution: inventory</summary>
+
+Add to `roles/deploy_inventories/vars/main.yml`:
 
 ```yaml
   - name: <username>-ocp-inventory
@@ -210,7 +231,12 @@ There is no new project: Part B uses `<username>-nginx-project`, which is alread
     organization: <organization>
 ```
 
-`roles/deploy_hosts/vars/main.yml`:
+</details>
+
+<details>
+<summary>Solution: host</summary>
+
+Add to `roles/deploy_hosts/vars/main.yml`:
 
 ```yaml
   - name: localhost
@@ -218,7 +244,12 @@ There is no new project: Part B uses `<username>-nginx-project`, which is alread
     inventory: <username>-ocp-inventory
 ```
 
-`roles/deploy_job_templates/vars/main.yml`:
+</details>
+
+<details>
+<summary>Solution: job template</summary>
+
+Add to `roles/deploy_job_templates/vars/main.yml`:
 
 ```yaml
   - name: <username>-ocp-template
@@ -257,10 +288,6 @@ There is no new project: Part B uses `<username>-nginx-project`, which is alread
 ```
 
 </details>
-
-Commit and push, the same way as in step 4.
-
-Expected result: a new CaC job with status **Successful**, and `<username>-ocp-template` now has the description you set. Your Part B objects each exist once.
 
 ### Step 6: Drift test (10 min)
 
