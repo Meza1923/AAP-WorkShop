@@ -14,6 +14,9 @@ command -v htpasswd > /dev/null || { echo "htpasswd not found (install httpd-too
 # OpenShift logins: one htpasswd file for all users, applied as a Secret after the loop.
 htpasswd_file=$(mktemp)
 trap 'rm -f "${htpasswd_file}"' EXIT
+# Keep users that this script does not create (e.g. manager) from the current Secret.
+kubectl get secret htpass-secret -n openshift-config -o jsonpath='{.data.htpasswd}' 2> /dev/null \
+  | base64 -d | grep -vE '^user[0-9]+:' >> "${htpasswd_file}" || true
 
 auth=(-H "Authorization: Bearer ${TOKEN}" -H "Content-Type: application/json")
 
@@ -50,7 +53,7 @@ for i in $(seq 1 "${NUM_USERS}"); do
   echo "Created user '${name}' with organization '${name}', namespace '${ns}', service account and OpenShift login '${name}' (admin, monitoring-rules-edit, alert-routing-edit)"
 done
 
-# Replaces htpass-secret with exactly the users above, then enables the htpasswd login.
+# Writes htpass-secret (users above plus kept users), then enables the htpasswd login.
 kubectl create secret generic htpass-secret -n openshift-config \
   --from-file=htpasswd="${htpasswd_file}" --dry-run=client -o yaml | kubectl apply -f - > /dev/null
 kubectl apply -f "${REPO_DIR}/openshift/htpasswd/oauth.yaml" > /dev/null

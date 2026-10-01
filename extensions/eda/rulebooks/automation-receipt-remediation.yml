@@ -21,11 +21,16 @@
 
     # Step 4: remove the leading "# " from the lines of this rule (keep the
     # indentation), then replace both TODO lines.
-    # - name: Restart the Automation Receipt
-    #   condition: TODO
-    #   throttle:
-    #     once_within: 5 minutes
-    #     group_by_attributes:
-    #       - event.payload.commonLabels.alertname
-    #   action:
-    #     TODO
+    - name: Restart the Automation Receipt
+      condition: event.payload.commonLabels.alertname == "AutomationReceiptDown"
+      throttle:
+        once_within: 5 minutes
+        group_by_attributes:
+          - event.payload.commonLabels.alertname
+      action:
+        run_job_template:
+          name: cactest-ocp-template-ocp-template
+          organization: default
+          job_args:
+            extra_vars:
+              AAP_NAMESPACE: nginx-test-app

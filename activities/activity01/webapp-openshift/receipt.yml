@@ -209,7 +209,7 @@
                       deployment="{{ app_name }}"} == 0
                     for: 1m
                     labels:
-                      severity: warning
+                      severity: critical
                       app: "{{ app_name }}"
                     annotations:
                       summary: >-

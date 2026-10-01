@@ -42,7 +42,7 @@ Open the file. A rulebook has three parts:
 
 `match_multiple_rules: true` lets more than one rule act on the same event. Without it, only the first matching rule acts, and the print rule would block the remediation rule. Keep the print rule first: then it keeps showing every event after the remediation rule is active.
 
-Why: EDA only finds rulebooks in `extensions/eda/rulebooks/` (or `rulebooks/`) at the root of the repository. That is why this file does not live in the `activities/` folder.
+Why: EDA only finds rulebooks in `extensions/eda/rulebooks/` at the root of the repository. That is why this file does not live in the `activities/` folder.
 
 Expected result: the file is in your fork, and you know which part is the source, which are the rules, and which are the actions.
 
@@ -71,7 +71,7 @@ Save it and wait until the sync finishes.
 
 Why: EDA reads rulebooks from Git, just like AAP reads playbooks from a project.
 
-Expected result: the project shows the rulebook `automation-receipt-remediation.yml`.
+Expected result: the project status is **Completed**. The project page doesn't list rulebooks.
 
 #### 2c. Event stream credential
 
@@ -342,3 +342,5 @@ From scaled to zero to restored:
 | Rule matches and launches a job | Rulebook activation `<username>-remediation` |
 | Job logs in to AAP | `<username>-eda-aap-credential` |
 | App is redeployed and the receipt updated | `<username>-ocp-template` from Activity 1 Part B |
+
+Want to learn more about rulebooks? Start with the [ansible-rulebook introduction](https://docs.ansible.com/projects/rulebook/en/v1.3.1/introduction.html).
