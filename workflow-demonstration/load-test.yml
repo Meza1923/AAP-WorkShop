@@ -1,0 +1,95 @@
+---
+# Workflow demo: stress test nginx on the VM itself with ab (ApacheBench) and
+# publish the results with set_stats, so later workflow jobs receive them.
+# requests and concurrency come from the workflow survey.
+- name: Load test nginx
+  hosts: all
+  become: true
+  gather_facts: false
+
+  tasks:
+    - name: Require the inputs
+      ansible.builtin.assert:
+        that:
+          - nginx_port is defined
+          - requests is defined
+          - concurrency is defined
+        fail_msg: >-
+          Missing input. nginx_port comes from the host variables in the
+          inventory; requests and concurrency come from the workflow survey.
+        quiet: true
+
+    - name: Validate requests and concurrency
+      ansible.builtin.assert:
+        that:
+          - requests | string is match('^[0-9]+$')
+          - concurrency | string is match('^[0-9]+$')
+          - concurrency | int >= 1
+          - concurrency | int <= requests | int
+        fail_msg: >-
+          requests and concurrency must be positive integers, and concurrency
+          cannot be higher than requests (got requests={{ requests }},
+          concurrency={{ concurrency }}).
+        quiet: true
+
+    # set_stats publishes one result for the whole job, so test one VM only.
+    - name: Require exactly one host
+      ansible.builtin.assert:
+        that:
+          - ansible_play_hosts_all | length == 1
+        fail_msg: >-
+          The load test expects one host in the inventory, found
+          {{ ansible_play_hosts_all | length }}.
+        quiet: true
+
+    - name: Install ApacheBench
+      ansible.builtin.dnf:
+        name: httpd-tools
+        state: present
+
+    # Runs on the VM against localhost: the load never leaves the VM.
+    - name: Run the load test
+      ansible.builtin.command:
+        argv:
+          - ab
+          - -n
+          - "{{ requests | int }}"
+          - -c
+          - "{{ concurrency | int }}"
+          - "http://localhost:{{ nginx_port }}/"
+      register: ab_run
+      changed_when: false
+
+    # Built in one expression so the numbers stay numbers in stress_results.
+    - name: Parse the results
+      ansible.builtin.set_fact:
+        load_results: >-
+          {{ {'host': inventory_hostname,
+              'url': 'http://localhost:' ~ nginx_port ~ '/',
+              'concurrency': concurrency | int,
+              'total_requests': complete | first | int,
+              'failed_requests': failed | first | int,
+              'non_2xx_responses': (non_2xx or ['0']) | first | int,
+              'requests_per_second': rps | first | float,
+              'avg_response_ms': avg_ms | first | float} }}
+      vars:
+        complete: "{{ ab_run.stdout | regex_search('^Complete requests:\\s+(\\d+)', '\\1', multiline=True) }}"
+        failed: "{{ ab_run.stdout | regex_search('^Failed requests:\\s+(\\d+)', '\\1', multiline=True) }}"
+        # ab prints this line only when there are non-2xx responses.
+        non_2xx: "{{ ab_run.stdout | regex_search('^Non-2xx responses:\\s+(\\d+)', '\\1', multiline=True) }}"
+        rps: "{{ ab_run.stdout | regex_search('^Requests per second:\\s+([0-9.]+)', '\\1', multiline=True) }}"
+        # The first "Time per request" line: the mean time one request takes,
+        # as a user experiences it at this concurrency.
+        avg_ms: "{{ ab_run.stdout | regex_search('^Time per request:\\s+([0-9.]+) \\[ms\\] \\(mean\\)$', '\\1', multiline=True) }}"
+
+    - name: Show the results
+      ansible.builtin.debug:
+        var: load_results
+
+    # per_host: false is required for AAP to pass the data to the next jobs.
+    - name: Publish the results to the workflow
+      ansible.builtin.set_stats:
+        data:
+          stress_results: "{{ load_results }}"
+        per_host: false
+        aggregate: false

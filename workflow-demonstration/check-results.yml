@@ -1,0 +1,71 @@
+---
+# Workflow demo: compare the load test results with the limits from the
+# workflow survey. The job fails when a limit is exceeded; that failure sends
+# the workflow down its failure branch.
+- name: Check the load test results
+  hosts: localhost
+  connection: local
+  gather_facts: false
+
+  tasks:
+    - name: Require the load test results
+      ansible.builtin.assert:
+        that:
+          - stress_results is defined
+        fail_msg: >-
+          stress_results is not defined. It is published by the load test job
+          and only reaches this job when both run inside the workflow.
+        quiet: true
+
+    - name: Require the limits
+      ansible.builtin.assert:
+        that:
+          - max_avg_response_ms is defined
+          - max_error_percent is defined
+        fail_msg: >-
+          Missing limit. max_avg_response_ms and max_error_percent come from
+          the workflow survey.
+        quiet: true
+
+    - name: Calculate the error rate
+      ansible.builtin.set_fact:
+        error_count: "{{ errors | int }}"
+        error_percent: >-
+          {{ ((errors | int * 100) / (stress_results.total_requests | int)) | round(2)
+             if stress_results.total_requests | int > 0 else 100.0 }}
+      vars:
+        errors: "{{ stress_results.failed_requests | int + stress_results.non_2xx_responses | int }}"
+
+    - name: Find the exceeded limits
+      ansible.builtin.set_fact:
+        exceeded: >-
+          {{ ([('Average response time ' ~ avg_ms ~ ' ms exceeds the limit of '
+                ~ limit_ms ~ ' ms by ' ~ (avg_ms | float - limit_ms | float) | round(2) ~ ' ms')]
+               if avg_ms | float > limit_ms | float else [])
+             + ([('Error rate ' ~ err_pct ~ '% exceeds the limit of '
+                 ~ limit_pct ~ '% by ' ~ (err_pct | float - limit_pct | float) | round(2)
+                 ~ ' percentage points')]
+                if err_pct | float > limit_pct | float else []) }}
+      vars:
+        avg_ms: "{{ stress_results.avg_response_ms }}"
+        limit_ms: "{{ max_avg_response_ms }}"
+        err_pct: "{{ error_percent }}"
+        limit_pct: "{{ max_error_percent }}"
+
+    - name: Show results against limits
+      ansible.builtin.debug:
+        msg:
+          - "{{ '%-22s %14s %14s  %s' | format('Metric', 'Result', 'Limit', 'Status') }}"
+          - "{{ '%-22s %14s %14s  %s' | format('Avg response (ms)', stress_results.avg_response_ms, max_avg_response_ms,
+              'OK' if stress_results.avg_response_ms | float <= max_avg_response_ms | float else 'EXCEEDED') }}"
+          - "{{ '%-22s %14s %14s  %s' | format('Error rate (%)', error_percent, max_error_percent,
+              'OK' if error_percent | float <= max_error_percent | float else 'EXCEEDED') }}"
+          - "{{ '%-22s %14s %14s  %s' | format('Requests completed', stress_results.total_requests, '-', '') }}"
+          - "{{ '%-22s %14s %14s  %s' | format('Failed + non-2xx', error_count, '-', '') }}"
+          - "{{ '%-22s %14s %14s  %s' | format('Requests per second', stress_results.requests_per_second, '-', '') }}"
+          - "{{ '%-22s %14s %14s  %s' | format('Concurrency', stress_results.concurrency, '-', '') }}"
+
+    - name: Fail when a limit is exceeded
+      ansible.builtin.fail:
+        msg: "Performance limits exceeded: {{ exceeded | join('; ') }}."
+      when: exceeded | length > 0

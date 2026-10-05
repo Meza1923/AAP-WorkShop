@@ -29,7 +29,7 @@ spec:
   api:
     log_level: INFO
     replicas: 1
-    resource_reqeuirements:
+    resource_requirements:
       limits:
         cpu: "2"
         memory: "4Gi"

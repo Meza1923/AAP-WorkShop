@@ -1,0 +1,61 @@
+---
+# Data only: the five workflow demo job templates, in the same structure as
+# Activity 2 (roles/deploy_job_templates/vars/main.yml). Copy the entries
+# below controller_job_templates into that file in your CaC fork and push.
+# Names are for the admin user in the admin organization.
+# The workflow itself is NOT here: it is built live.
+controller_job_templates:  # noqa: var-naming[no-role-prefix]
+  - name: Workflow demo - Load test
+    state: present
+    organization: admin
+    description: Stress tests nginx on the VM with ab and publishes the results.
+    inventory: admin-nginx-inventory
+    project: admin-nginx-project
+    playbook: workflow-demonstration/load-test.yml
+    execution_environment: Default execution environment
+    credentials:
+      - admin-nginx-credential
+    become_enabled: true
+
+  - name: Workflow demo - Check results
+    state: present
+    organization: admin
+    description: Fails when the load test results exceed the survey limits.
+    inventory: admin-nginx-inventory
+    project: admin-nginx-project
+    playbook: workflow-demonstration/check-results.yml
+    execution_environment: Default execution environment
+
+  - name: Workflow demo - Reload nginx
+    state: present
+    organization: admin
+    description: Reloads nginx on the VM and checks the page responds.
+    inventory: admin-nginx-inventory
+    project: admin-nginx-project
+    playbook: workflow-demonstration/reload-nginx.yml
+    execution_environment: Default execution environment
+    credentials:
+      - admin-nginx-credential
+    become_enabled: true
+
+  - name: Workflow demo - Notify passed
+    state: present
+    organization: admin
+    description: Reports that the stress test passed.
+    inventory: admin-nginx-inventory
+    project: admin-nginx-project
+    playbook: workflow-demonstration/notify.yml
+    execution_environment: Default execution environment
+    extra_vars:
+      notify_outcome: passed
+
+  - name: Workflow demo - Notify capacity
+    state: present
+    organization: admin
+    description: Reports that the server needs more capacity.
+    inventory: admin-nginx-inventory
+    project: admin-nginx-project
+    playbook: workflow-demonstration/notify.yml
+    execution_environment: Default execution environment
+    extra_vars:
+      notify_outcome: capacity

@@ -82,7 +82,7 @@ This value describes one particular machine, not the job and not the playbook. W
 <details>
 <summary>Hint 2</summary>
 
-TODO: link to AAP 2.7 docs on inventory host variables.
+See the [AAP 2.7 docs on inventory variables](https://docs.redhat.com/en/documentation/red_hat_ansible_automation_platform/2.7/administer-proc_controller_adding_new_inventory#proc-controller-add-groups_procedure).
 
 </details>
 

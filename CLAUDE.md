@@ -55,6 +55,8 @@ Repo root: `/root/github/AAP-WorkShop`
   EDA projects only discover rulebooks in specific root folders, so this is the ONE
   exception to the rule that activity content lives in its activity folder.
   Only Activity 3 uses it.
+- `workflow-demonstration/`: instructor-only workflow demo shown at the end of day 1.
+  Not a participant activity: no participant README. Has its own CLAUDE.md.
 
 ## Activity folder conventions
 - Each activity folder contains: playbooks, supporting files (templates etc.), and a

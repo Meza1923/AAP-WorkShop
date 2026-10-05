@@ -1,0 +1,35 @@
+---
+# Workflow demo: reload nginx after a failed load test, then check the page
+# responds again. This recovers the service; it does not add capacity.
+- name: Reload nginx
+  hosts: all
+  become: true
+  gather_facts: false
+
+  tasks:
+    - name: Require nginx_port
+      ansible.builtin.assert:
+        that:
+          - nginx_port is defined
+        fail_msg: "Missing nginx_port. It comes from the host variables in the inventory."
+        quiet: true
+
+    # A reload fails if nginx is stopped, so make sure it runs first.
+    - name: Make sure nginx is running
+      ansible.builtin.service:
+        name: nginx
+        state: started
+
+    - name: Reload nginx
+      ansible.builtin.service:
+        name: nginx
+        state: reloaded
+
+    - name: Verify the page responds
+      ansible.builtin.uri:
+        url: "http://localhost:{{ nginx_port }}/"
+        status_code: 200
+      register: page_check
+      until: page_check.status == 200
+      retries: 5
+      delay: 2

@@ -1,0 +1,50 @@
+---
+# Workflow demo: report the outcome. Two job templates use this playbook, each
+# with a fixed notify_outcome extra var: passed or capacity.
+# In production this would be an AAP notification template (email, Teams,
+# Slack) attached to the workflow, instead of a printed message.
+- name: Notify the load test outcome
+  hosts: localhost
+  connection: local
+  gather_facts: false
+
+  vars:
+    notify_messages:
+      passed: "Stress test passed. The server is within the performance limits."
+      capacity: "Stress test failed, nginx reloaded, the server should be extended."
+
+  tasks:
+    - name: Require a valid outcome
+      ansible.builtin.assert:
+        that:
+          - notify_outcome is defined
+          - notify_outcome in notify_messages
+        fail_msg: >-
+          notify_outcome must be one of: {{ notify_messages.keys() | join(', ') }}.
+          It is set as an extra variable on the job template.
+        quiet: true
+
+    - name: Require the load test results
+      ansible.builtin.assert:
+        that:
+          - stress_results is defined
+        fail_msg: >-
+          stress_results is not defined. It is published by the load test job
+          and only reaches this job when both run inside the workflow.
+        quiet: true
+
+    - name: Print the notification
+      ansible.builtin.debug:
+        msg:
+          - "===================================================="
+          - "{{ notify_messages[notify_outcome] }}"
+          - "===================================================="
+          - "Server:              {{ stress_results.host }}"
+          - "Requests completed:  {{ stress_results.total_requests }}"
+          - "Concurrency:         {{ stress_results.concurrency }}"
+          - "Failed requests:     {{ stress_results.failed_requests }}"
+          - "Non-2xx responses:   {{ stress_results.non_2xx_responses }}"
+          - "Requests per second: {{ stress_results.requests_per_second }}"
+          - "Avg response time:   {{ stress_results.avg_response_ms }} ms
+            (limit {{ max_avg_response_ms | default('not set') }} ms)"
+          - "Error rate limit:    {{ max_error_percent | default('not set') }} %"

@@ -1,0 +1,25 @@
+---
+- name: Simple playbook
+  hosts: localhost
+  gather_facts: false
+
+  vars:
+    message: Hello from Ansible
+
+  pre_tasks:
+    - name: Show pre_tasks message
+      ansible.builtin.debug:
+        msg: Starting playbook
+
+  tasks:
+    - name: Show message
+      ansible.builtin.debug:
+        msg: "{{ message }}"
+
+  post_tasks:
+    - name: Show post_tasks message
+      ansible.builtin.debug:
+        msg: Playbook finished
+
+
+
