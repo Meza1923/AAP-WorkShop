@@ -4,18 +4,8 @@
 Participants take the AAP objects they created by hand in Activity 1 (both Part A
 webapp-vm and Part B webapp-openshift) and manage them from Git. A push to their fork
 triggers a webhook, which runs a CaC job template that applies the configuration.
-
-## Git server: GitHub or Gitea
-The workshop runs with either one; the instructor decides per workshop. Wherever the steps
-differ, the README gives two options: "Option A: GitHub" and "Option B: Gitea".
-- GitHub: participants fork `https://github.com/Meza1923/AAP-WorkShop` into their own
-  GitHub account (`<github-user>`).
-- Gitea: runs on the cluster (`openshift/gitea/`). The instructor imports the workshop
-  repo as a public repo; participants fork it there. Gitea logins are the same username
-  and password as AAP. Gitea address placeholder: `<gitea-host>`.
-- The README calls the participant's fork URL `<fork-url>` (defined in step 1, also used
-  by Activity 3).
-- Forks are public on both. Nothing secret may ever be committed.
+The fork already exists (created in Activity 1, see the root CLAUDE.md for GitHub/Gitea);
+Activity 2 only clones it.
 Build everything in `activities/activity02/`.
 Out of scope for this task: the DR session content. Do not write anything about DR.
 
@@ -26,6 +16,8 @@ Out of scope for this task: the DR session content. Do not write anything about 
 - Bootstrap: a few objects must exist before CaC can manage anything. Participants
   create them by hand: an AAP credential, a CaC project pointing to their fork, and a
   CaC job template with webhook enabled. CaC does not manage these bootstrap objects.
+  The Part A project points to the same fork but is managed by CaC, which is why the
+  CaC job needs its own project.
 - Participants write almost no YAML from scratch:
   - The skeleton contains ONE example of each object kind, modeled on Part A: an
     inventory, a host with the `nginx_port` host variable, a project, and a job template
@@ -43,10 +35,10 @@ Out of scope for this task: the DR session content. Do not write anything about 
   restored, then launch it and see the Automation Receipt show a new job.
 
 ## Technical requirements
-- Use only `ansible.controller` and `ansible.platform` modules. Both are in the Default
-  execution environment of AAP 2.7, so no extra collection or custom execution
-  environment is needed. Do not switch to `infra.aap_configuration`: it is not in the
-  Default execution environment (see `Execution-environment/README.md`).
+- The CaC job template runs in the `cac-image` execution environment. This activity
+  is the only one that uses it; Activities 1 and 3 use the Default execution environment.
+- The playbook uses `ansible.controller` and `ansible.platform` modules. Any other
+  collection must exist in `cac-image`.
 - The CaC playbook runs on `localhost`, authenticates to AAP only through the AAP
   credential attached to the job template (environment variables injected by AAP).
   No URLs, usernames, passwords, or tokens in the repo.
@@ -79,8 +71,8 @@ do, why it matters (one or two sentences), expected result.
 1. Goal: what CaC gives you (consistent, auditable, recoverable) in three short sentences.
 2. Warning box near the top: your fork is public. Never commit passwords, keys, or tokens.
 3. Steps:
-   1. Fork the repo (GitHub or Gitea option) and look at the skeleton. Explain what each
-      file describes. (10 min)
+   1. Clone the fork from Activity 1 and look at the skeleton. Explain what each file
+      describes. (10 min)
    2. Create the bootstrap objects: AAP credential, CaC project (with update revision on
       launch), CaC job template with webhook enabled (service GitHub, also for Gitea).
       Explain why these stay manual. (20 min)

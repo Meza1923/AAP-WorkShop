@@ -38,20 +38,23 @@ Participants build every AAP object by hand in the UI. They do NOT write the pla
 ## Part A README requirements
 For each step: what to do, why it matters (one or two sentences), expected result.
 1. Goal and estimated time (75-90 minutes).
-2. What you were given: VM address, SSH username, SSH key, AAP URL and login (placeholders).
+2. What you were given: VM address, SSH username, SSH key, AAP URL and login, workshop
+   repo, Git server and Git account (placeholders).
 3. Naming convention reminder.
 4. Steps:
-   1. Create a Machine credential with the SSH key.
-   2. Create an inventory and add the VM as a host.
-   3. Create a project pointing to the Git repo, sync it, verify success.
-   4. Create a job template and run it. Expected: it FAILS on purpose. Add the note:
+   1. Fork the workshop repo into your own account: "Option A: GitHub" and
+      "Option B: Gitea". Defines `<fork-url>`, used by every later activity.
+   2. Create a Machine credential with the SSH key.
+   3. Create an inventory and add the VM as a host.
+   4. Create a project pointing to your fork (`<fork-url>`), sync it, verify success.
+   5. Create a job template and run it. Expected: it FAILS on purpose. Add the note:
       "You may need more than one fix before the job succeeds."
-   5. "Fix the missing variables" (title must match the playbook's failure message).
+   6. "Fix the missing variables" (title must match the playbook's failure message).
       Per variable, tiered help: Hint 1 (conceptual nudge), Hint 2 (official docs link),
       Solution in a collapsed `<details>` block. Survey answer variable name must be
       exactly `page_title`, and the solution must mention enabling the survey.
-   6. Run again, enter a title, open http://<vm-address>:8080, confirm the title appears.
-   7. Run again with the same values, confirm changed=0, explain idempotency briefly.
+   7. Run again, enter a title, open http://<vm-address>:8080, confirm the title appears.
+   8. Run again with the same values, confirm changed=0, explain idempotency briefly.
 5. Troubleshooting: project sync fails; host unreachable (IP/user/key); privilege
    escalation errors; survey not enabled; variable name typo in the survey.
 6. Recap: each AAP object and its purpose.
@@ -96,7 +99,7 @@ Rules:
 - `hosts: localhost`, `connection: local`, `gather_facts: false`, and set
   `ansible_python_interpreter` to `{{ ansible_playbook_python }}` so the execution
   environment's Python (with the Kubernetes libraries) is used.
-- Use `kubernetes.core` modules. Confirm the collection exists in {EE_NAME}.
+- Use `kubernetes.core` modules. Confirm the collection exists in the Default execution environment.
 - Authenticate only through the AAP OpenShift/Kubernetes credential (it injects the API
   host and token as environment variables). Never put the API URL or token in the repo.
 - First task: assert `AAP_NAMESPACE` is defined, with a clear message pointing to the survey

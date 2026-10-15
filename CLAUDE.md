@@ -18,20 +18,29 @@ All activities build on the same scenario, so each one continues the previous:
 - AAP version: 2.7
 - VM operating system: RHEL9
 - SSH username on VMs: ec2-user
-- Execution environment: Default
-- Git repo URL used by participants: will be provide in the future
+- Execution environment: Default execution environment for Activities 1 and 3.
+  Activity 2 (CaC) uses the execution environment `cac-image` (image `aap/cac-image`).
+- Workshop Git repo: `https://github.com/Meza1923/AAP-WorkShop`
 - Every participant has their own VM and shares one AAP instance with everyone else.
 - nginx port is always 8080 (already allowed by SELinux on RHEL; no SELinux handling needed).
-- OpenShift API URL: {OCP_API_URL}
-- OpenShift version: {OCP_VERSION}
+- OpenShift API URL: `https://api.cluster-vc4zx.vc4zx.sandbox2372.opentlc.com:6443`
+- OpenShift version: 4.20.39
 - Webapp container image (non-root, listens on 8080): `docker.io/nginxinc/nginx-unprivileged:latest`.
   Participants supply it through the Part B survey (`WEBAPP_IMAGE`, optional, this as default).
 - HTML directory served by that image: `/usr/share/nginx/html`
 - Every participant has their own OpenShift namespace and a service account with
   edit rights limited to that namespace. Participants receive the namespace name and token.
-- AAP public URL (reachable from the internet, used for GitHub webhooks): {AAP_URL}
-- In Activity 2, participants fork {GIT_URL} into their own GitHub account.
+- AAP public URL (reachable from the internet, used for Git webhooks): `https://aap-aap.apps.cluster-vc4zx.vc4zx.sandbox2372.opentlc.com/`
+- Participants fork the workshop repo in Activity 1 Part A, step 1, and work from their
+  own fork in every activity: all their AAP and EDA projects point to it.
   Forks are public: nothing secret may ever be committed.
+- Git server: GitHub or Gitea; the instructor decides per workshop. Wherever steps
+  differ, participant READMEs give two options: "Option A: GitHub" and "Option B: Gitea".
+  - GitHub: participants fork into their own account (`<github-user>`).
+  - Gitea: runs on the cluster (`openshift/gitea/`, address placeholder `<gitea-host>`).
+    The instructor imports the workshop repo into Gitea as a public repo; participants
+    fork it there. Gitea logins are the same username and password as AAP.
+  - READMEs call the participant's fork URL `<fork-url>` (defined in Activity 1 Part A).
 - OpenShift user workload monitoring is enabled, including the user workload
   Alertmanager with user-defined alert routing (`AlertmanagerConfig`) allowed.
 
@@ -51,7 +60,7 @@ Repo root: `/root/github/AAP-WorkShop`
   is allowed, e.g. to match the username format used in naming conventions.
 - `playbooks/`: the instructor's personal test area. Ignore it completely. Never put
   activity playbooks here; activity playbooks always live in their activity folder.
-- `{RULEBOOK_DIR}` (at the repo root, e.g. `extensions/eda/rulebooks/`): EDA rulebooks.
+- `extensions/eda/rulebooks/` (at the repo root): EDA rulebooks.
   EDA projects only discover rulebooks in specific root folders, so this is the ONE
   exception to the rule that activity content lives in its activity folder.
   Only Activity 3 uses it.
@@ -66,7 +75,7 @@ Repo root: `/root/github/AAP-WorkShop`
 - Participant AAP objects are prefixed with the participant's username, e.g. `<username>-nginx-inventory`.
 - Playbooks must pass `ansible-lint` (production profile if feasible) and `ansible-playbook --syntax-check`.
 - Prefer `ansible.builtin` modules. Any 
-other collection must exist in {EE_NAME}, or be listed in `collections/requirements.yml`.
+other collection must exist in the execution environment of that activity (see above), or be listed in `collections/requirements.yml`.
 
 ## Writing style for participant READMEs
 Participants read these during a live workshop, with the instructor in the room.
@@ -94,5 +103,5 @@ Example of the right tone:
 - Only work inside the activity folder you were asked to work on.
 - Do not add content belonging to a later activity (e.g. no CaC in Activity 1).
 - At the end of every task, report: files created or changed, assumptions made, and all TODOs.
-- Only work inside the activity folder you were asked to work on (plus `{RULEBOOK_DIR}`
+- Only work inside the activity folder you were asked to work on (plus `extensions/eda/rulebooks/`
   when working on Activity 3).

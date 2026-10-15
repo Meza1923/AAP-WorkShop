@@ -8,8 +8,6 @@ You'll deploy a small web page, the Automation Receipt, into your own OpenShift 
 - You reuse the project you created in Part A.
 - AAP passes information about the job to the playbook by itself, and the page shows it.
 
-Time: 45-60 minutes.
-
 ## 2. What you were given
 
 | | |
@@ -77,8 +75,6 @@ Launch the template. In the survey, enter your namespace, `<namespace>`, and kee
 Why: the playbook creates a ConfigMap, a Deployment, a Service and a Route in your namespace. The page you see is served from the ConfigMap.
 
 The job also creates an alert rule that fires when your app is down. You don't need it now; you use it in Activity 3.
-
-At the bottom of the page, the workshop journey shows your progress. It updates on each run of this job template as you finish the next activities.
 
 ### Step 6: Where did these values come from?
 

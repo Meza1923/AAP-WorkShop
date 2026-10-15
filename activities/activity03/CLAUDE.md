@@ -4,7 +4,7 @@
 When a participant's Automation Receipt webapp (Activity 1 Part B) is scaled to zero,
 the alert `AutomationReceiptDown` fires, Alertmanager sends it to the participant's EDA
 event stream, and a rulebook launches the Part B job template, which restores the app.
-Build participant content in `activities/activity03/` and the rulebook in `{RULEBOOK_DIR}`.
+Build participant content in `activities/activity03/` and the rulebook in `extensions/eda/rulebooks/`.
 
 Already in place from earlier activities (do not rebuild):
 - The Deployment `automation-receipt` and the PrometheusRule with alert
@@ -14,7 +14,7 @@ Already in place from earlier activities (do not rebuild):
   as `AAP_NAMESPACE`; the optional `WEBAPP_IMAGE` has a default). The remediation action
   must pass `AAP_NAMESPACE` in `job_args.extra_vars`, because nobody answers the survey
   when EDA launches the job.
-- The participant's CaC fork and webhook pipeline from Activity 2.
+- The participant's fork (created in Activity 1) and the CaC webhook pipeline from Activity 2.
 
 ## Learning design (must be preserved)
 - Rules match on event data. Participants first SEE a real event, then write a rule for it.
@@ -27,7 +27,7 @@ Already in place from earlier activities (do not rebuild):
 - EDA objects (credential, project, event stream, activation) are created by hand.
   The README acknowledges in one sentence that in real life these could also be managed as code.
 
-## Deliverable 1: Rulebook (in {RULEBOOK_DIR})
+## Deliverable 1: Rulebook (in `extensions/eda/rulebooks/`)
 - File name: `automation-receipt-remediation.yml`.
 - Starter version (what participants receive) must be valid and runnable as-is:
   - One rule that prints every received event (debug action).
@@ -53,7 +53,8 @@ Already in place from earlier activities (do not rebuild):
 
 ## Deliverable 3: "Connect Alertmanager" playbook
 Location: `activities/activity03/connect-alertmanager/`. It is reached through the
-Activity 1 project (main repo), not through the CaC fork.
+Activity 1 project (`<username>-nginx-project`, which reads the participant's fork), not
+through the CaC project.
 - `hosts: localhost`, `connection: local`, `gather_facts: false`, interpreter set to
   `{{ ansible_playbook_python }}`, `kubernetes.core` modules, auth only through the
   attached OpenShift credential.

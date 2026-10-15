@@ -10,8 +10,8 @@ So far, every job ran because a person clicked **Launch** or pushed a commit. In
 | | |
 |---|---|
 | From Activity 1 Part B | `<username>-ocp-credential`, `<username>-ocp-inventory`, `<username>-ocp-template`, and your app running in `<namespace>` |
-| From Activity 1 Part A | `<username>-nginx-project` (it holds the playbook for step 6) |
-| From Activity 2 | Your fork `<fork-url>` (on GitHub or Gitea) and your working CaC webhook |
+| From Activity 1 Part A | Your fork `<fork-url>` (on GitHub or Gitea), and `<username>-nginx-project`, which reads it (it holds the playbook for step 6) |
+| From Activity 2 | Your clone of the fork and your working CaC webhook |
 | AAP URL and login | the same as before |
 | Decision environment | `Default decision environment` |
 
@@ -222,7 +222,7 @@ Why: this is the whole idea of EDA. The same job template you used by hand now r
 
 ### Step 6: Add the connect-alertmanager job template through CaC (15 min)
 
-So far you sent a fake alert by hand. To let OpenShift send the real one, a playbook configures Alertmanager in your namespace. It lives in the workshop repository, so it is reached through `<username>-nginx-project`. Sync that project first, so AAP finds the new playbook.
+So far you sent a fake alert by hand. To let OpenShift send the real one, a playbook configures Alertmanager in your namespace. It is already in your fork, and `<username>-nginx-project` reads your fork. Sync that project first, so AAP finds the playbook.
 
 In your fork, open `activities/activity02/aap_config_as_code/roles/deploy_job_templates/vars/main.yml` and paste this entry at the end of the file:
 

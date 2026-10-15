@@ -11,9 +11,8 @@ In Activity 1 you built your AAP objects by hand. Now you describe them in Git, 
 
 | | |
 |---|---|
-| Workshop repo to fork | `<git-repo-url>`, the same repo as in Activity 1 |
-| Your Git server | GitHub or Gitea. Your instructor tells you which one the workshop uses, and for Gitea its address, `https://<gitea-host>`. |
-| Your Git account | GitHub: your own account, `<github-user>`. Gitea: your AAP username and password. |
+| Your fork | `<fork-url>`, the fork you created in Activity 1 Part A, step 1 |
+| Your Git account | GitHub: your own account. Gitea: your AAP username and password. |
 | AAP URL and login | the same as Activity 1 |
 | Your organization | `<organization>`, the organization your Activity 1 objects belong to |
 | Your Activity 1 objects | Part A and Part B, both working |
@@ -28,26 +27,16 @@ You create three new objects by hand in this activity:
 
 ## 4. Steps
 
-### Step 1: Fork the repo and look at the skeleton (10 min)
+### Step 1: Clone your fork and look at the skeleton (10 min)
 
-Fork `<git-repo-url>` into your own account. Follow the option for your Git server.
-
-#### Option A: GitHub
-
-Log in to GitHub, open `<git-repo-url>` and click **Fork**, then **Create fork**. Your fork's URL is `https://github.com/<github-user>/AAP-WorkShop.git`.
-
-#### Option B: Gitea
-
-Log in to Gitea with your AAP username and password. Open `<git-repo-url>` and click **Fork**, then **Fork Repository**. Your fork's URL is `https://<gitea-host>/<username>/AAP-WorkShop.git`. When Git asks for a login, use the same username and password.
-
-#### Clone your fork
-
-In this activity and in Activity 3, `<fork-url>` means your fork's URL from above. Clone it:
+Clone the fork you created in Activity 1:
 
 ```bash
 git clone <fork-url>
 cd AAP-WorkShop/activities/activity02/aap_config_as_code
 ```
+
+On Gitea, when Git asks for a login, use your AAP username and password.
 
 This folder holds everything CaC uses:
 
@@ -88,7 +77,7 @@ Each `vars/main.yml` contains one example, modeled on your Part A objects. Value
 
 There is no role for credentials. Credentials stay in AAP, and job templates refer to them by name only.
 
-Expected result: your fork exists on GitHub or Gitea, and you have looked at the four roles.
+Expected result: you have a local clone of your fork, and you have looked at the four roles.
 
 ### Step 2: Create the bootstrap objects (20 min)
 
@@ -115,9 +104,9 @@ Create `<username>-cac-project`:
 
 Save it and wait until the sync shows **Successful**.
 
-Why: this project reads your fork, not the workshop repo. **Update revision on launch** makes every CaC job fetch the latest commit first. Without it, the job runs whatever commit the project synced last, and your push seems to have no effect.
+Why: **Update revision on launch** makes every CaC job fetch the latest commit first. Without it, the job runs whatever commit the project synced last, and your push seems to have no effect.
 
-Your Part A project, `<username>-nginx-project`, stays as it is and keeps pointing to the workshop repo.
+`<username>-nginx-project` reads the same fork, but CaC manages it (it is in `roles/deploy_projects/vars/main.yml`). The CaC job needs a project that CaC never changes, so it gets its own.
 
 #### 2c. CaC job template
 
@@ -126,7 +115,7 @@ Create `<username>-cac-template`:
 - Inventory: `<username>-ocp-inventory` (your Part B inventory; the CaC playbook also runs on `localhost`)
 - Project: `<username>-cac-project`
 - Playbook: `activities/activity02/aap_config_as_code/deploy_main.yaml`
-- Execution environment: Default execution environment
+- Execution environment: `cac-image`
 - Credential: `<username>-aap-credential`
 - **Enable webhook**: on
 - **Webhook service**: GitHub
@@ -192,7 +181,7 @@ Open the four `roles/*/vars/main.yml` files and replace every placeholder:
 |---|---|
 | `<username>` | Your AAP username, for example `user7` |
 | `<organization>` | Your organization |
-| `<git-repo-url>` | The **Source control URL** of `<username>-nginx-project`, copied from AAP |
+| `<git-repo-url>` | The **Source control URL** of `<username>-nginx-project`, copied from AAP (your fork) |
 | `<vm-address>` | Your VM's host name, exactly as it appears in `<username>-nginx-inventory` |
 
 > [!IMPORTANT]

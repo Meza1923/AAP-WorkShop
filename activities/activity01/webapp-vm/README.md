@@ -14,7 +14,9 @@ You'll set up everything AAP needs to run a playbook on your own VM, then use it
 | SSH private key | `<ssh-private-key>` |
 | AAP URL | `<aap-url>` |
 | AAP login | `<username>` / `<password>` |
-| Git repo | `<git-repo-url>`: on GitHub `https://github.com/Meza1923/AAP-WorkShop.git`, on Gitea the address your instructor gives you |
+| Workshop repo | `<git-repo-url>`: on GitHub `https://github.com/Meza1923/AAP-WorkShop`, on Gitea the address your instructor gives you |
+| Git server | GitHub or Gitea. Your instructor tells you which one the workshop uses, and for Gitea its address, `https://<gitea-host>`. |
+| Git account | GitHub: your own account, `<github-user>`. Gitea: your AAP username and password. |
 
 ## 3. Naming
 
@@ -27,28 +29,45 @@ Everyone shares this AAP, so start every object name with your username:
 
 ## 4. Steps
 
-### Step 1: Machine credential
+### Step 1: Fork the workshop repo
+
+Fork `<git-repo-url>` into your own account. Follow the option for your Git server.
+
+#### Option A: GitHub
+
+Log in to GitHub, open `<git-repo-url>` and click **Fork**, then **Create fork**. Your fork's URL is `https://github.com/<github-user>/AAP-WorkShop.git`.
+
+#### Option B: Gitea
+
+Log in to Gitea with your AAP username and password. Open `<git-repo-url>` and click **Fork**, then **Fork Repository**. Your fork's URL is `https://<gitea-host>/<username>/AAP-WorkShop.git`.
+
+In all activities, `<fork-url>` means this URL.
+
+Why: every activity runs from your own copy of the repo. Later you change files in it, and only your AAP objects follow.
+
+
+### Step 2: Machine credential
 
 Create a **Machine** credential named `<username>-nginx-credential`. Username `ec2-user`, paste in the SSH private key.
 
 Why: the key lives encrypted in AAP. It never goes in a playbook, an inventory or Git.
 
 
-### Step 2: Inventory and host
+### Step 3: Inventory and host
 
 Create `<username>-nginx-inventory` and add your VM as a host, using `<vm-address>` as the host name.
 
 Why: the inventory is the list of machines AAP is allowed to touch.
 
 
-### Step 3: Project
+### Step 4: Project
 
-Create `<username>-nginx-project` (source control type Git) with the repo URL from section 2. Save it and let it sync.
+Create `<username>-nginx-project` (source control type Git) with your fork's URL, `<fork-url>`, as the source control URL. Save it and let it sync.
 
 Why: this is how playbooks get from Git into AAP.
 
 
-### Step 4: Job template
+### Step 5: Job template
 
 Create `<username>-nginx-template`:
 
@@ -62,7 +81,7 @@ Create `<username>-nginx-template`:
 Save it and launch it.
 
 
-### Step 5: Fix the missing variables
+### Step 6: Fix the missing variables
 
 Your job failed. Good. Read the error in the job output. It tells you what is missing, and it points you back to this section.
 
@@ -132,14 +151,14 @@ Then make sure the survey is **enabled**. A survey that isn't enabled never show
 
 Why: values that describe a host go in the inventory. Values chosen at run time go in a survey.
 
-### Step 6: Run it and open the page
+### Step 7: Run it and open the page
 
 Launch the template and type a title, like `Hello from <username>`. When it finishes, open `http://<vm-address>:8080`.
 
 Why: it proves the whole chain works.
 
 
-### Step 7: Run it again
+### Step 8: Run it again
 
 Launch again with the same title.
 
@@ -148,7 +167,7 @@ Why: running a playbook twice shouldn't change anything the second time. That's 
 
 ## 5. Troubleshooting
 
-- **Project sync fails:** check the Git URL, and that AAP can reach the repo.
+- **Project sync fails:** check that the source control URL is your fork, `<fork-url>`, and that AAP can reach it.
 - **Host unreachable:** check the host name is your `<vm-address>`, the user is `ec2-user`, and you pasted the whole key, BEGIN and END lines included.
 - **Privilege escalation error:** turn on privilege escalation in the job template.
 - **No survey when launching:** it's probably saved but not enabled.
@@ -157,6 +176,7 @@ Why: running a playbook twice shouldn't change anything the second time. That's 
 
 ## 6. Recap
 
+- **Fork:** your own copy of the repo. Every activity runs from it.
 - **Credential:** holds the SSH key, encrypted.
 - **Inventory:** the machines, plus variables that describe them.
 - **Project:** brings playbooks in from Git.
