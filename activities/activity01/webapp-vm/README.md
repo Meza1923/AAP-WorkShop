@@ -14,9 +14,10 @@ You'll set up everything AAP needs to run a playbook on your own VM, then use it
 | SSH private key | `<ssh-private-key>` |
 | AAP URL | `<aap-url>` |
 | AAP login | `<username>` / `<password>` |
-| Workshop repo | `<git-repo-url>`: on GitHub `https://github.com/Meza1923/AAP-WorkShop`, on Gitea the address your instructor gives you |
-| Git server | GitHub or Gitea. Your instructor tells you which one the workshop uses, and for Gitea its address, `https://<gitea-host>`. |
+| Workshop repo | `<git-repo-url>`: `https://github.com/Meza1923/AAP-WorkShop.git` |
+| Git server for your own repo | GitHub or Gitea. Your instructor tells you which one the workshop uses, and for Gitea its address, `https://<gitea-host>`. |
 | Git account | GitHub: your own account, `<github-user>`. Gitea: your AAP username and password. |
+| Your computer | A terminal with `git` installed |
 
 ## 3. Naming
 
@@ -29,21 +30,51 @@ Everyone shares this AAP, so start every object name with your username:
 
 ## 4. Steps
 
-### Step 1: Fork the workshop repo
+### Step 1: Make your own copy of the workshop repo
 
-Fork `<git-repo-url>` into your own account. Follow the option for your Git server.
+You create an empty repo in your own account, then copy the workshop repo into it with Git.
 
-#### Option A: GitHub
+Why: every activity runs from your own repo. Later you change files in it, and only your AAP objects follow.
 
-Log in to GitHub, open `<git-repo-url>` and click **Fork**, then **Create fork**. Your fork's URL is `https://github.com/<github-user>/AAP-WorkShop.git`.
+#### 1a. Create an empty repo
 
-#### Option B: Gitea
+Two rules, for both options:
 
-Log in to Gitea with your AAP username and password. Open `<git-repo-url>` and click **Fork**, then **Fork Repository**. Your fork's URL is `https://<gitea-host>/<username>/AAP-WorkShop.git`.
+- Name the repo exactly `AAP-WorkShop`, with the same upper and lower case.
+- Use the branch `main`. The workshop files are on `main`, and you push them to `main` in 1b. Don't rename it or work on another branch.
 
-In all activities, `<fork-url>` means this URL.
+The later steps and activities rely on this name and branch.
 
-Why: every activity runs from your own copy of the repo. Later you change files in it, and only your AAP objects follow.
+Follow the option for your Git server.
+
+Option A, GitHub: log in to GitHub and create a new repository named `AAP-WorkShop`. Make it **Public**, and don't add a README, `.gitignore` or license. Your repo URL is `https://github.com/<github-user>/AAP-WorkShop.git`.
+
+Option B, Gitea: log in to Gitea with your AAP username and password. Open the **+** menu, choose **New Repository**, and set **Repository Name** to `AAP-WorkShop`. Leave **Make repository private** and **Initialize Repository** off, then click **Create Repository**. Your repo URL is `https://<gitea-host>/<username>/AAP-WorkShop.git`.
+
+In all activities, `<your-repo-url>` means this URL.
+
+The repo must be empty, so the first push doesn't conflict. It must be public, so AAP can read it without a login. Never put passwords, keys or tokens in it.
+
+#### 1b. Copy the workshop repo into it
+
+```bash
+git clone <git-repo-url>
+cd AAP-WorkShop
+git remote rename origin upstream
+git remote add origin <your-repo-url>
+git push -u origin main
+```
+
+When Git asks for a login:
+
+- GitHub doesn't accept your account password here. Use a personal access token that can push to your repo, created in your GitHub account settings.
+- Gitea: your AAP username and password.
+
+Why: `origin` is now your repo, so every `git push` goes there. `upstream` still points to the workshop repo, so you can pull updates from it later.
+
+Keep this folder. Activities 2 and 3 work in it.
+
+Expected result: your repo on GitHub or Gitea shows the workshop files, and `git remote -v` lists `origin` (your repo) and `upstream` (the workshop repo).
 
 
 ### Step 2: Machine credential
@@ -62,7 +93,7 @@ Why: the inventory is the list of machines AAP is allowed to touch.
 
 ### Step 4: Project
 
-Create `<username>-nginx-project` (source control type Git) with your fork's URL, `<fork-url>`, as the source control URL. Save it and let it sync.
+Create `<username>-nginx-project` (source control type Git) with your repo URL, `<your-repo-url>`, as the source control URL. Save it and let it sync.
 
 Why: this is how playbooks get from Git into AAP.
 
@@ -167,7 +198,7 @@ Why: running a playbook twice shouldn't change anything the second time. That's 
 
 ## 5. Troubleshooting
 
-- **Project sync fails:** check that the source control URL is your fork, `<fork-url>`, and that AAP can reach it.
+- **Project sync fails:** check that the source control URL is your repo, `<your-repo-url>`, and that AAP can reach it.
 - **Host unreachable:** check the host name is your `<vm-address>`, the user is `ec2-user`, and you pasted the whole key, BEGIN and END lines included.
 - **Privilege escalation error:** turn on privilege escalation in the job template.
 - **No survey when launching:** it's probably saved but not enabled.
@@ -176,7 +207,7 @@ Why: running a playbook twice shouldn't change anything the second time. That's 
 
 ## 6. Recap
 
-- **Fork:** your own copy of the repo. Every activity runs from it.
+- **Your repo:** your own copy of the workshop repo. Every activity runs from it.
 - **Credential:** holds the SSH key, encrypted.
 - **Inventory:** the machines, plus variables that describe them.
 - **Project:** brings playbooks in from Git.

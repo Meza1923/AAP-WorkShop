@@ -5,13 +5,13 @@
 In Activity 1 you built your AAP objects by hand. Now you describe them in Git, and every push makes AAP match that description. That keeps AAP consistent with Git, gives you an audit trail of every change, and lets you restore a deleted object with one job run.
 
 > [!NOTE]
-> Your fork is public, so keep passwords, keys and tokens out of it. Git also keeps old commits, so deleting a secret later doesn't really remove it.
+> Your repo is public, so keep passwords, keys and tokens out of it. Git also keeps old commits, so deleting a secret later doesn't really remove it.
 
 ## 2. What you need
 
 | | |
 |---|---|
-| Your fork | `<fork-url>`, the fork you created in Activity 1 Part A, step 1 |
+| Your repo | `<your-repo-url>`, and the local clone you made in Activity 1 Part A, step 1 |
 | Your Git account | GitHub: your own account. Gitea: your AAP username and password. |
 | AAP URL and login | the same as Activity 1 |
 | Your organization | `<organization>`, the organization your Activity 1 objects belong to |
@@ -27,16 +27,15 @@ You create three new objects by hand in this activity:
 
 ## 4. Steps
 
-### Step 1: Clone your fork and look at the skeleton (10 min)
+### Step 1: Look at the skeleton (10 min)
 
-Clone the fork you created in Activity 1:
+Go to the CaC folder in the clone you made in Activity 1:
 
 ```bash
-git clone <fork-url>
 cd AAP-WorkShop/activities/activity02/aap_config_as_code
 ```
 
-On Gitea, when Git asks for a login, use your AAP username and password.
+If that clone is gone, clone your repo again with `git clone <your-repo-url>`.
 
 This folder holds everything CaC uses:
 
@@ -77,11 +76,11 @@ Each `vars/main.yml` contains one example, modeled on your Part A objects. Value
 
 There is no role for credentials. Credentials stay in AAP, and job templates refer to them by name only.
 
-Expected result: you have a local clone of your fork, and you have looked at the four roles.
+Expected result: you are in the CaC folder of your clone, and you have looked at the four roles.
 
 ### Step 2: Create the bootstrap objects (20 min)
 
-CaC needs a way in before it can manage anything: a login for AAP, a project that reads your fork, and a job template that runs the playbook. You create these three by hand. They are not in any `vars/main.yml`, so CaC never changes them. If CaC managed its own job template, one bad push could break the job you need to fix it.
+CaC needs a way in before it can manage anything: a login for AAP, a project that reads your repo, and a job template that runs the playbook. You create these three by hand. They are not in any `vars/main.yml`, so CaC never changes them. If CaC managed its own job template, one bad push could break the job you need to fix it.
 
 #### 2a. AAP credential
 
@@ -99,14 +98,14 @@ Create `<username>-cac-project`:
 
 - Organization: `<organization>`
 - **Source control type**: Git
-- **Source control URL**: your fork, `<fork-url>`
+- **Source control URL**: your repo, `<your-repo-url>`
 - **Update revision on launch**: on
 
 Save it and wait until the sync shows **Successful**.
 
 Why: **Update revision on launch** makes every CaC job fetch the latest commit first. Without it, the job runs whatever commit the project synced last, and your push seems to have no effect.
 
-`<username>-nginx-project` reads the same fork, but CaC manages it (it is in `roles/deploy_projects/vars/main.yml`). The CaC job needs a project that CaC never changes, so it gets its own.
+`<username>-nginx-project` reads the same repo, but CaC manages it (it is in `roles/deploy_projects/vars/main.yml`). The CaC job needs a project that CaC never changes, so it gets its own.
 
 #### 2c. CaC job template
 
@@ -126,13 +125,13 @@ Save it. The template now shows a **Webhook URL** and a **Webhook key**. Keep th
 
 Expected result: three new objects, and the project sync shows **Successful**.
 
-### Step 3: Connect your fork to AAP (15 min)
+### Step 3: Connect your repo to AAP (15 min)
 
 Follow the option for your Git server.
 
 #### Option A: GitHub
 
-In your fork on GitHub, open **Settings**, then **Webhooks**, then **Add webhook**, and fill in:
+In your repo on GitHub, open **Settings**, then **Webhooks**, then **Add webhook**, and fill in:
 
 - **Payload URL**: the **Webhook URL** from your job template
 - **Content type**: `application/json`
@@ -146,7 +145,7 @@ To check a delivery later, open the webhook and go to the **Recent Deliveries** 
 
 #### Option B: Gitea
 
-In your fork on Gitea, open **Settings**, then **Webhooks**, then **Add Webhook**, and choose **Gitea**. Fill in:
+In your repo on Gitea, open **Settings**, then **Webhooks**, then **Add Webhook**, and choose **Gitea**. Fill in:
 
 - **Target URL**: the **Webhook URL** from your job template
 - **HTTP Method**: POST
@@ -162,7 +161,7 @@ To check a delivery later, open the webhook and scroll down to **Recent Deliveri
 
 #### Check the first delivery
 
-Why: from now on your Git server calls AAP on every push. It signs each call with the secret, and AAP rejects calls with a wrong signature. That way only your fork can start your job.
+Why: from now on your Git server calls AAP on every push. It signs each call with the secret, and AAP rejects calls with a wrong signature. That way only your repo can start your job.
 
 AAP starts your CaC job for the test event. That job fails at the task **Check that no example placeholders are left**. This is expected, because you haven't replaced the placeholders yet. It proves the webhook works.
 
@@ -181,7 +180,7 @@ Open the four `roles/*/vars/main.yml` files and replace every placeholder:
 |---|---|
 | `<username>` | Your AAP username, for example `user7` |
 | `<organization>` | Your organization |
-| `<git-repo-url>` | The **Source control URL** of `<username>-nginx-project`, copied from AAP (your fork) |
+| `<git-repo-url>` | The **Source control URL** of `<username>-nginx-project`, copied from AAP (your repo) |
 | `<vm-address>` | Your VM's host name, exactly as it appears in `<username>-nginx-inventory` |
 
 > [!IMPORTANT]
@@ -337,11 +336,11 @@ Why: Git holds the full description of the template, so CaC can rebuild it from 
 
 Expected result: the Automation Receipt shows a new job number and the job template name `<username>-ocp-template`, and its workshop journey now marks **Configuration as Code** as done. The restored template is a new object, so its job history starts empty.
 
-A deleted credential could NOT be restored this way. Git only holds its name, never the token or SSH key behind it, and it must stay that way because your fork is public. If a credential is deleted, the CaC job fails because it can't find the credential by name, and you recreate the credential by hand from the key or token you were given. Don't try this; just keep it in mind.
+A deleted credential could NOT be restored this way. Git only holds its name, never the token or SSH key behind it, and it must stay that way because your repo is public. If a credential is deleted, the CaC job fails because it can't find the credential by name, and you recreate the credential by hand from the key or token you were given. Don't try this; just keep it in mind.
 
 ### Step 8: Find the audit trail
 
-On GitHub or Gitea, open your fork and click the commit count (**Commits**) to see its history. Or run:
+On GitHub or Gitea, open your repo and click the commit count (**Commits**) to see its history. Or run:
 
 ```bash
 git log --oneline -- roles/

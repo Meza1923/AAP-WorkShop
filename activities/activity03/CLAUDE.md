@@ -14,7 +14,7 @@ Already in place from earlier activities (do not rebuild):
   as `AAP_NAMESPACE`; the optional `WEBAPP_IMAGE` has a default). The remediation action
   must pass `AAP_NAMESPACE` in `job_args.extra_vars`, because nobody answers the survey
   when EDA launches the job.
-- The participant's fork (created in Activity 1) and the CaC webhook pipeline from Activity 2.
+- The participant's repo (created in Activity 1) and the CaC webhook pipeline from Activity 2.
 
 ## Learning design (must be preserved)
 - Rules match on event data. Participants first SEE a real event, then write a rule for it.
@@ -23,7 +23,7 @@ Already in place from earlier activities (do not rebuild):
 - The remediation action is the participant's existing Part B job template. No new
   remediation playbook. The Automation Receipt then shows a job not launched by a person.
 - The "connect Alertmanager" job template is created through CaC (Activity 2), not by hand.
-  The README gives its full YAML; participants paste it into their fork and push.
+  The README gives its full YAML; participants paste it into their repo and push.
 - EDA objects (credential, project, event stream, activation) are created by hand.
   The README acknowledges in one sentence that in real life these could also be managed as code.
 
@@ -53,7 +53,7 @@ Already in place from earlier activities (do not rebuild):
 
 ## Deliverable 3: "Connect Alertmanager" playbook
 Location: `activities/activity03/connect-alertmanager/`. It is reached through the
-Activity 1 project (`<username>-nginx-project`, which reads the participant's fork), not
+Activity 1 project (`<username>-nginx-project`, which reads the participant's repo), not
 through the CaC project.
 - `hosts: localhost`, `connection: local`, `gather_facts: false`, interpreter set to
   `{{ ansible_playbook_python }}`, `kubernetes.core` modules, auth only through the
@@ -90,8 +90,8 @@ Follow the root writing style. Estimated time: about 120 minutes. For each step:
 to do, why it matters (one or two sentences), expected result.
 1. Goal: what EDA adds (automation that reacts to events, not to people) in a few sentences.
 2. Steps:
-   1. Look at the starter rulebook in your fork: source, rules, actions. (5 min)
-   2. Create the EDA objects: AAP credential for EDA, EDA project pointing to your fork,
+   1. Look at the starter rulebook in your repo: source, rules, actions. (5 min)
+   2. Create the EDA objects: AAP credential for EDA, EDA project pointing to your repo,
       event stream credential, event stream named `<username>-alerts`, and a rulebook
       activation using the starter rulebook. (30 min)
    3. Send the sample alert and read the event in the activation output. Point out where

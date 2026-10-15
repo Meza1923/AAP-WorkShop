@@ -2,21 +2,21 @@
 
 ## Scope
 Participants take the AAP objects they created by hand in Activity 1 (both Part A
-webapp-vm and Part B webapp-openshift) and manage them from Git. A push to their fork
+webapp-vm and Part B webapp-openshift) and manage them from Git. A push to their repo
 triggers a webhook, which runs a CaC job template that applies the configuration.
-The fork already exists (created in Activity 1, see the root CLAUDE.md for GitHub/Gitea);
-Activity 2 only clones it.
+The participant repo and its local clone already exist (created in Activity 1, see the
+root CLAUDE.md); Activity 2 works in that clone.
 Build everything in `activities/activity02/`.
 Out of scope for this task: the DR session content. Do not write anything about DR.
 
 ## Learning design (must be preserved)
 - Configuration lives in Git; AAP is updated to match it. Git history is the audit trail.
 - Credentials are NEVER in Git. CaC references credentials by name only. They were
-  created by hand in Activity 1 and stay manual. The fork is public, so this is critical.
+  created by hand in Activity 1 and stay manual. The repo is public, so this is critical.
 - Bootstrap: a few objects must exist before CaC can manage anything. Participants
-  create them by hand: an AAP credential, a CaC project pointing to their fork, and a
+  create them by hand: an AAP credential, a CaC project pointing to their repo, and a
   CaC job template with webhook enabled. CaC does not manage these bootstrap objects.
-  The Part A project points to the same fork but is managed by CaC, which is why the
+  The Part A project points to the same repo but is managed by CaC, which is why the
   CaC job needs its own project.
 - Participants write almost no YAML from scratch:
   - The skeleton contains ONE example of each object kind, modeled on Part A: an
@@ -58,7 +58,7 @@ Out of scope for this task: the DR session content. Do not write anything about 
   webhook (type "Gitea") sends GitHub-compatible headers (`X-GitHub-Event`,
   `X-GitHub-Delivery`, `X-Hub-Signature`) and a GitHub-style push payload (`ref`,
   `after`). Verified against Gitea 1.27.3 only, not yet end to end with AAP.
-- Participants copy the job template's webhook URL and webhook key into their fork's
+- Participants copy the job template's webhook URL and webhook key into their repo's
   webhook settings: content type `application/json`, push events only.
   - GitHub: sends a test event as soon as the webhook is saved.
   - Gitea: sends nothing by itself; participants click **Test Delivery**.
@@ -69,14 +69,14 @@ Out of scope for this task: the DR session content. Do not write anything about 
 Follow the root writing style. Estimated time: about 110 minutes. For each step: what to
 do, why it matters (one or two sentences), expected result.
 1. Goal: what CaC gives you (consistent, auditable, recoverable) in three short sentences.
-2. Warning box near the top: your fork is public. Never commit passwords, keys, or tokens.
+2. Warning box near the top: your repo is public. Never commit passwords, keys, or tokens.
 3. Steps:
-   1. Clone the fork from Activity 1 and look at the skeleton. Explain what each file
+   1. Go to the clone from Activity 1 and look at the skeleton. Explain what each file
       describes. (10 min)
    2. Create the bootstrap objects: AAP credential, CaC project (with update revision on
       launch), CaC job template with webhook enabled (service GitHub, also for Gitea).
       Explain why these stay manual. (20 min)
-   3. Configure the webhook in the fork's settings (GitHub or Gitea option). Show how to
+   3. Configure the webhook in the repo's settings (GitHub or Gitea option). Show how to
       check "Recent Deliveries". (15 min)
    4. Replace the example values to match your Part A objects. Place the exact-name
       warning right here. Commit, push, confirm the webhook job ran and AAP matches. (20 min)
@@ -86,7 +86,7 @@ do, why it matters (one or two sentences), expected result.
    7. Recovery test: delete your Part B job template, run the CaC job, confirm it's back,
       launch it, check the Automation Receipt. Note that a deleted credential could NOT be
       restored this way, and why. (15 min)
-   8. Show where the audit trail is: the fork's commit history.
+   8. Show where the audit trail is: the repo's commit history.
 4. Troubleshooting: webhook shows failed delivery (GitHub or Gitea); signature or 403 errors
    (wrong webhook key); job ran but nothing changed (update revision on launch disabled);
    duplicate objects appeared (name mismatch); "credential not found" (credential name

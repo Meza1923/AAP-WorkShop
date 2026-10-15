@@ -1,10 +1,8 @@
 # CaC execution environment (instructor setup)
 
-Optional. The activities don't need this image: the Activity 2 CaC playbook uses only
-`ansible.controller` and `ansible.platform` modules, which are in the Default execution
-environment. Build it only if you want playbooks that use the `infra.aap_configuration`
-collection. The Default execution environment of AAP 2.7 (`ee-supported-rhel9`) does not
-contain it.
+The Activity 2 CaC job template runs in the execution environment `cac-image` (image
+`aap/cac-image`). Build this image once before the workshop and register it in AAP.
+Participants only select it. Activities 1 and 3 use the Default execution environment.
 
 What the image contains:
 
@@ -27,13 +25,13 @@ You need `podman`, `ansible-builder` 3.x, and a Red Hat login for `registry.redh
 ```bash
 cd Execution-environment
 podman login registry.redhat.io
-ansible-builder build -f execution-environment.yml -t cac-ee:1.0
+ansible-builder build -f execution-environment.yml -t aap/cac-image:latest
 ```
 
 Check that the collection is in the image:
 
 ```bash
-podman run --rm cac-ee:1.0 ansible-galaxy collection list infra.aap_configuration
+podman run --rm aap/cac-image:latest ansible-galaxy collection list infra.aap_configuration
 ```
 
 Expected: `infra.aap_configuration 4.10.0`.
@@ -45,25 +43,25 @@ served on the AAP host name, so `<registry>` is the host part of the AAP URL (fo
 `aap-aap.apps.<cluster-domain>`, without `https://`). Log in with an AAP admin account:
 
 ```bash
-podman tag cac-ee:1.0 <registry>/cac-ee:1.0
+podman tag aap/cac-image:latest <registry>/aap/cac-image:latest
 podman login <registry>
-podman push <registry>/cac-ee:1.0
+podman push <registry>/aap/cac-image:latest
 ```
 
 ## 3. Register it in AAP
 
 Create an execution environment:
 
-- Name: `CaC execution environment`
-- Image: `<registry>/cac-ee:1.0`
+- Name: `cac-image` (the Activity 2 README uses this exact name)
+- Image: `<registry>/aap/cac-image:latest`
 - Pull: always pull the image before running
 - Organization: leave empty, so every participant organization can use it
 - Registry credential: only if the registry needs a login to pull
 
 ## 4. Test it
 
-Run a playbook that uses an `infra.aap_configuration` role with this execution
-environment, and check that the role runs.
+Before the workshop, run Activity 2 once with a test user. The CaC job of
+`<username>-cac-template` must run in `cac-image` and finish **Successful**.
 
 ## Updating the collection
 

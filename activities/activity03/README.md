@@ -10,8 +10,8 @@ So far, every job ran because a person clicked **Launch** or pushed a commit. In
 | | |
 |---|---|
 | From Activity 1 Part B | `<username>-ocp-credential`, `<username>-ocp-inventory`, `<username>-ocp-template`, and your app running in `<namespace>` |
-| From Activity 1 Part A | Your fork `<fork-url>` (on GitHub or Gitea), and `<username>-nginx-project`, which reads it (it holds the playbook for step 6) |
-| From Activity 2 | Your clone of the fork and your working CaC webhook |
+| From Activity 1 Part A | Your repo `<your-repo-url>` (on GitHub or Gitea), and `<username>-nginx-project`, which reads it (it holds the playbook for step 6) |
+| From Activity 2 | Your local clone of your repo and your working CaC webhook |
 | AAP URL and login | the same as before |
 | Decision environment | `Default decision environment` |
 
@@ -28,11 +28,14 @@ New objects in this activity:
 
 ### Step 1: Look at the starter rulebook (5 min)
 
-Your fork must contain the file `extensions/eda/rulebooks/automation-receipt-remediation.yml`. If it doesn't, update your fork from the workshop repo. On GitHub, open your fork, click **Sync fork**, then **Update branch**. On Gitea, open your fork and click **Sync fork**. Then pull the change:
+Your repo must contain the file `extensions/eda/rulebooks/automation-receipt-remediation.yml`. If it doesn't, get the latest workshop files and push them to your repo. Run this in the root folder of your clone:
 
 ```bash
-git pull
+git pull upstream main
+git push
 ```
+
+If Git says `upstream` doesn't exist, you cloned your repo again after Activity 1. Add it first with `git remote add upstream https://github.com/Meza1923/AAP-WorkShop.git`, then run the two commands again.
 
 Open the file. A rulebook has three parts:
 
@@ -44,7 +47,7 @@ Open the file. A rulebook has three parts:
 
 Why: EDA only finds rulebooks in `extensions/eda/rulebooks/` at the root of the repository. That is why this file does not live in the `activities/` folder.
 
-Expected result: the file is in your fork, and you know which part is the source, which are the rules, and which are the actions.
+Expected result: the file is in your repo, and you know which part is the source, which are the rules, and which are the actions.
 
 ### Step 2: Create the EDA objects (30 min)
 
@@ -65,7 +68,7 @@ Why: when a rule fires, the rulebook launches your job template through the AAP 
 Create an EDA project named `<username>-eda-project`:
 
 - **Source control type**: Git
-- **Source control URL**: your fork, `<fork-url>`
+- **Source control URL**: your repo, `<your-repo-url>`
 
 Save it and wait until the sync finishes.
 
@@ -80,7 +83,7 @@ Create a credential of type **Token Event Stream** named `<username>-event-strea
 - **Token**: a long random value you choose. To generate one, run `openssl rand -hex 24` (bash) or `[guid]::NewGuid().ToString("N")` (PowerShell).
 - **HTTP Header Key**: `Authorization` (the default)
 
-Keep the token at hand for steps 3 and 6. Never commit it to your fork.
+Keep the token at hand for steps 3 and 6. Never commit it to your repo.
 
 Why: Alertmanager sends the token as `Authorization: Bearer <token>`. The **Token Event Stream** type accepts exactly that: it reads the `Authorization` header and accepts the token with or without the `Bearer ` prefix. Other types, such as **Basic Event Stream** or **HMAC Event Stream**, expect a different format and would reject every alert.
 
@@ -147,7 +150,7 @@ Why: you can only write a rule for data you have seen. The printed event shows y
 
 ### Step 4: Write the condition and the action (20 min)
 
-In your fork, open `extensions/eda/rulebooks/automation-receipt-remediation.yml`. Remove the leading `# ` from every line of the `Restart the Automation Receipt` rule, keeping the indentation. Then replace the two `TODO` lines:
+In your repo, open `extensions/eda/rulebooks/automation-receipt-remediation.yml`. Remove the leading `# ` from every line of the `Restart the Automation Receipt` rule, keeping the indentation. Then replace the two `TODO` lines:
 
 - The **condition** must match when the alert name is `AutomationReceiptDown`.
 - The **action** must launch your job template `<username>-ocp-template` in `<organization>`, and pass your namespace as `AAP_NAMESPACE`.
@@ -222,9 +225,9 @@ Why: this is the whole idea of EDA. The same job template you used by hand now r
 
 ### Step 6: Add the connect-alertmanager job template through CaC (15 min)
 
-So far you sent a fake alert by hand. To let OpenShift send the real one, a playbook configures Alertmanager in your namespace. It is already in your fork, and `<username>-nginx-project` reads your fork. Sync that project first, so AAP finds the playbook.
+So far you sent a fake alert by hand. To let OpenShift send the real one, a playbook configures Alertmanager in your namespace. It is already in your repo, and `<username>-nginx-project` reads your repo. Sync that project first, so AAP finds the playbook.
 
-In your fork, open `activities/activity02/aap_config_as_code/roles/deploy_job_templates/vars/main.yml` and paste this entry at the end of the file:
+In your repo, open `activities/activity02/aap_config_as_code/roles/deploy_job_templates/vars/main.yml` and paste this entry at the end of the file:
 
 ```yaml
   - name: <username>-connect-alertmanager
@@ -323,7 +326,7 @@ Expected result: the app is back within a few minutes, without you launching any
 - **Activation won't start:** open the activation output. A YAML or rulebook error points to a line in the rulebook; compare it with the solution in step 4. If the error mentions the decision environment or pulling an image, tell the instructor.
 - **401 or 403 when sending the sample:** the token in your command must match the token in `<username>-event-stream-credential`, and the header must be `Authorization: Bearer <token>`. Check that the event stream uses the **Token Event Stream** credential.
 - **No event in the activation output:** check the URL in your command against the URL of `<username>-alerts`. Check that the activation maps the source `alertmanager` to `<username>-alerts`, and that test mode is off on the event stream.
-- **Only `Print every event` ever fires:** the activation still runs your old rulebook. EDA works from its last project sync, not from your fork. Sync `<username>-eda-project`, then restart `<username>-remediation`.
+- **Only `Print every event` ever fires:** the activation still runs your old rulebook. EDA works from its last project sync, not from your repo. Sync `<username>-eda-project`, then restart `<username>-remediation`.
 - **The event shows `'payload': {'body': None}`:** the request arrived empty. curl couldn't find the file: run the command from the root folder of your clone. curl only prints a warning in this case and still gets `200 OK`.
 - **Condition never matches:** compare your field path with the printed event: `event.payload.commonLabels.alertname`. Check that `Print every event` is still the first rule and `match_multiple_rules: true` is still there. If you changed the `sources` section, the mapping was dropped: edit the activation and map the source again.
 - **Job not launched:** the activation output shows the error. Check `<username>-eda-aap-credential`: the URL must end with `/api/controller/`. Check that `name` and `organization` in your action match `<username>-ocp-template` and `<organization>` exactly, including upper and lower case (`Default` is not `default`). If the error mentions `variables_needed_to_start`, the action does not pass `AAP_NAMESPACE`, or misspells it.

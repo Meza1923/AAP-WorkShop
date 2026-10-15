@@ -31,16 +31,20 @@ All activities build on the same scenario, so each one continues the previous:
 - Every participant has their own OpenShift namespace and a service account with
   edit rights limited to that namespace. Participants receive the namespace name and token.
 - AAP public URL (reachable from the internet, used for Git webhooks): `https://aap-aap.apps.cluster-vc4zx.vc4zx.sandbox2372.opentlc.com/`
-- Participants fork the workshop repo in Activity 1 Part A, step 1, and work from their
-  own fork in every activity: all their AAP and EDA projects point to it.
-  Forks are public: nothing secret may ever be committed.
-- Git server: GitHub or Gitea; the instructor decides per workshop. Wherever steps
-  differ, participant READMEs give two options: "Option A: GitHub" and "Option B: Gitea".
-  - GitHub: participants fork into their own account (`<github-user>`).
+- Participants do NOT fork. In Activity 1 Part A, step 1, each participant creates an
+  empty public repo `AAP-WorkShop` in their own account, clones the workshop repo,
+  renames its remote to `upstream`, adds their repo as `origin`, and pushes `main`.
+  They keep that local clone for Activities 2 and 3, and get workshop updates with
+  `git pull upstream main` + `git push`. All their AAP and EDA projects point to their repo.
+  Their repos are public: nothing secret may ever be committed.
+- Git server for the participant's repo: GitHub or Gitea; the instructor decides per
+  workshop. Wherever steps differ, READMEs give "Option A: GitHub" and "Option B: Gitea".
+  - GitHub: their own account (`<github-user>`); pushing needs a personal access token.
   - Gitea: runs on the cluster (`openshift/gitea/`, address placeholder `<gitea-host>`).
-    The instructor imports the workshop repo into Gitea as a public repo; participants
-    fork it there. Gitea logins are the same username and password as AAP.
-  - READMEs call the participant's fork URL `<fork-url>` (defined in Activity 1 Part A).
+    Gitea logins are the same username and password as AAP.
+  - The source is always the GitHub workshop repo (`<git-repo-url>`); nothing needs to
+    be imported into Gitea.
+  - READMEs call the participant's repo URL `<your-repo-url>` (defined in Activity 1 Part A).
 - OpenShift user workload monitoring is enabled, including the user workload
   Alertmanager with user-defined alert routing (`AlertmanagerConfig`) allowed.
 

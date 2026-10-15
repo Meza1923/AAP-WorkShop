@@ -42,11 +42,13 @@ For each step: what to do, why it matters (one or two sentences), expected resul
    repo, Git server and Git account (placeholders).
 3. Naming convention reminder.
 4. Steps:
-   1. Fork the workshop repo into your own account: "Option A: GitHub" and
-      "Option B: Gitea". Defines `<fork-url>`, used by every later activity.
+   1. Make your own copy of the workshop repo: create an empty public repo ("Option A:
+      GitHub", "Option B: Gitea"), then clone, set remotes and push with git. Defines
+      `<your-repo-url>`, used by every later activity. State that the repo must be named
+      exactly `AAP-WorkShop` and must use the branch `main`.
    2. Create a Machine credential with the SSH key.
    3. Create an inventory and add the VM as a host.
-   4. Create a project pointing to your fork (`<fork-url>`), sync it, verify success.
+   4. Create a project pointing to your repo (`<your-repo-url>`), sync it, verify success.
    5. Create a job template and run it. Expected: it FAILS on purpose. Add the note:
       "You may need more than one fix before the job succeeds."
    6. "Fix the missing variables" (title must match the playbook's failure message).

@@ -7,14 +7,14 @@ A hands-on workshop for Red Hat Ansible Automation Platform (AAP). Each topic is
 | | Activity | What you do |
 |---|---|---|
 | 1 | [AAP basics](activities/activity01/) | Deploy nginx on your own RHEL VM (Part A) and the "Automation Receipt" web page on OpenShift (Part B), building every AAP object by hand. |
-| 2 | [Configuration as Code](activities/activity02/) | Describe those AAP objects in your fork on GitHub or Gitea. Every push updates AAP through a webhook. |
+| 2 | [Configuration as Code](activities/activity02/) | Describe those AAP objects in your own repo on GitHub or Gitea. Every push updates AAP through a webhook. |
 | 3 | [Event-Driven Ansible](activities/activity03/) | When your web page goes down, an alert reaches EDA and a rulebook launches the job that brings it back. |
 
 ## How it fits together
 
 ```mermaid
 flowchart LR
-    Git["Your fork on GitHub or Gitea"] -- "push (webhook)" --> CaC["CaC job"]
+    Git["Your repo on GitHub or Gitea"] -- "push (webhook)" --> CaC["CaC job"]
     CaC -- "creates and updates" --> AAP["AAP job templates"]
     AAP -- "Activity 1 Part A" --> VM["nginx on RHEL VM"]
     AAP -- "Activity 1 Part B" --> App["Automation Receipt on OpenShift"]
@@ -35,7 +35,7 @@ The Automation Receipt shows your progress: each activity you finish lights up o
 | `lab/` | Instructor script that creates the participant users, namespaces and permissions |
 | `openshift/` | Cluster setup for the instructor, such as console logins and the [Gitea](openshift/gitea/) Git server |
 | `CaC/` | Instructor test that creates every workshop object at once |
-| `Execution-environment/` | Optional custom execution environment (not needed by the activities) |
+| `Execution-environment/` | Builds `aap/cac-image`, the execution environment `cac-image` used by the Activity 2 CaC job template |
 
 ## For participants
 

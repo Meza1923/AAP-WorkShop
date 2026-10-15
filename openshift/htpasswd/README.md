@@ -9,8 +9,8 @@ same password they use for AAP.
 | `htpass-secret.yaml` | That Secret, empty. Paste htpasswd lines into it (for example for `manager`) and apply it. Don't commit it once it has data. |
 | `cluster-admin-manager.yaml` | Gives the user `manager` the `cluster-admin` role on the whole cluster. |
 
-The committed Secret has no data: real entries are password hashes, and participants fork
-this repository publicly. `lab/create_users.sh` adds `user1` .. `userN` from
+The committed Secret has no data: real entries are password hashes, and participants copy
+this repository into public repos. `lab/create_users.sh` adds `user1` .. `userN` from
 `PASSWORD_OF_USERS` and applies the Secret together with `oauth.yaml`.
 
 ## Notes

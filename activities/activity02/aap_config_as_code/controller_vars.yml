@@ -1,5 +1,5 @@
 ---
 # Connection settings, filled at run time from the AAP credential on the
-# job template. No URL or secrets here: the fork is public.
+# job template. No URL or secrets here: the repo is public.
 controller_host: "{{ aap_hostname }}"
 controller_validate_certs: "{{ aap_validate_certs | default(true) }}"
