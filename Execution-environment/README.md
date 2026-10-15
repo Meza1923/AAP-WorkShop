@@ -1,8 +1,10 @@
 # CaC execution environment (instructor setup)
 
-The Activity 2 CaC playbook uses the `infra.aap_configuration` collection. The Default
-execution environment of AAP 2.7 (`ee-supported-rhel9`) does not contain it, so build this
-image once before the workshop and register it in AAP. Participants only select it.
+Optional. The activities don't need this image: the Activity 2 CaC playbook uses only
+`ansible.controller` and `ansible.platform` modules, which are in the Default execution
+environment. Build it only if you want playbooks that use the `infra.aap_configuration`
+collection. The Default execution environment of AAP 2.7 (`ee-supported-rhel9`) does not
+contain it.
 
 What the image contains:
 
@@ -38,8 +40,9 @@ Expected: `infra.aap_configuration 4.10.0`.
 
 ## 2. Push
 
-Push the image to a registry that AAP can pull from, for example the private automation hub
-that comes with AAP:
+Push the image to the private automation hub that comes with AAP. Its container registry is
+served on the AAP host name, so `<registry>` is the host part of the AAP URL (for example
+`aap-aap.apps.<cluster-domain>`, without `https://`). Log in with an AAP admin account:
 
 ```bash
 podman tag cac-ee:1.0 <registry>/cac-ee:1.0
@@ -47,13 +50,11 @@ podman login <registry>
 podman push <registry>/cac-ee:1.0
 ```
 
-TODO: decide which registry the workshop uses and replace `<registry>`.
-
 ## 3. Register it in AAP
 
 Create an execution environment:
 
-- Name: `CaC execution environment` (the Activity 2 README uses this exact name)
+- Name: `CaC execution environment`
 - Image: `<registry>/cac-ee:1.0`
 - Pull: always pull the image before running
 - Organization: leave empty, so every participant organization can use it
@@ -61,12 +62,11 @@ Create an execution environment:
 
 ## 4. Test it
 
-Before the workshop, run the Activity 2 steps once with a test user. The CaC job output
-should show the roles `infra.aap_configuration.controller_projects`,
-`controller_inventories`, `controller_hosts` and `controller_job_templates` running.
+Run a playbook that uses an `infra.aap_configuration` role with this execution
+environment, and check that the role runs.
 
 ## Updating the collection
 
 Change the version in `requirements.yml`, rebuild with a new tag, and update the image in
-the AAP execution environment. Re-check the variable names in
-`activities/activity02/cac/config/` against the new version's role documentation.
+the AAP execution environment. Re-check your variable names against the new version's role
+documentation.

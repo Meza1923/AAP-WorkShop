@@ -14,7 +14,7 @@ You'll set up everything AAP needs to run a playbook on your own VM, then use it
 | SSH private key | `<ssh-private-key>` |
 | AAP URL | `<aap-url>` |
 | AAP login | `<username>` / `<password>` |
-| Git repo | `<git-repo-url>` (TODO: instructor to provide the repository URL) |
+| Git repo | `<git-repo-url>`: on GitHub `https://github.com/Meza1923/AAP-WorkShop.git`, on Gitea the address your instructor gives you |
 
 ## 3. Naming
 

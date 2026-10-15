@@ -1,10 +1,11 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-AAP_URL="https://aap-aap.apps.cluster-gvcw9.gvcw9.sandbox2320.opentlc.com/"
+AAP_URL="https://aap-aap.apps.cluster-vc4zx.vc4zx.sandbox2372.opentlc.com/"
 TOKEN="a"
-PASSWORD_OF_USERS="aapworkshop77"
-NUM_USERS=20   # creates user1 .. user<NUM_USERS>
+PASSWORD_OF_USERS="a"
+NUM_USERS=10   # creates user1 .. user<NUM_USERS>
+ORG_FULL_ACCESS="true"   # "true": each user is Organization Admin of their own organization
 
 API="${AAP_URL%/}/api/gateway/v1"
 REPO_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
@@ -21,18 +22,30 @@ kubectl get secret htpass-secret -n openshift-config -o jsonpath='{.data.htpassw
 auth=(-H "Authorization: Bearer ${TOKEN}" -H "Content-Type: application/json")
 
 member_role_id=$(curl -sk -G "${auth[@]}" "${API}/role_definitions/" --data-urlencode "name=Organization Member" | jq -r '.results[0].id')
+admin_role_id=$(curl -sk -G "${auth[@]}" "${API}/role_definitions/" --data-urlencode "name=Organization Admin" | jq -r '.results[0].id')
+
+# Returns the id of the object with this name, creating it first if needed (safe to re-run).
+get_or_create() {
+  local kind=$1 name=$2 body=$3 id
+  id=$(curl -sk -G "${auth[@]}" "${API}/${kind}/" --data-urlencode "${4:-name}=${name}" | jq -r '.results[0].id // empty')
+  [ -n "${id}" ] || id=$(curl -sk "${auth[@]}" -X POST "${API}/${kind}/" -d "${body}" | jq -r '.id')
+  echo "${id}"
+}
 
 for i in $(seq 1 "${NUM_USERS}"); do
   name="user${i}"
 
-  org_id=$(curl -sk "${auth[@]}" -X POST "${API}/organizations/" \
-    -d "{\"name\": \"${name}\"}" | jq -r '.id')
+  org_id=$(get_or_create organizations "${name}" "{\"name\": \"${name}\"}")
+  user_id=$(get_or_create users "${name}" \
+    "{\"username\": \"${name}\", \"password\": \"${PASSWORD_OF_USERS}\"}" username)
 
-  user_id=$(curl -sk "${auth[@]}" -X POST "${API}/users/" \
-    -d "{\"username\": \"${name}\", \"password\": \"${PASSWORD_OF_USERS}\"}" | jq -r '.id')
-
-  curl -sk "${auth[@]}" -X POST "${API}/role_user_assignments/" \
-    -d "{\"user\": ${user_id}, \"role_definition\": ${member_role_id}, \"object_id\": ${org_id}}" > /dev/null
+  # Member makes the organization the user's home; Admin gives full access inside it.
+  org_roles=("${member_role_id}")
+  [ "${ORG_FULL_ACCESS}" = "true" ] && org_roles+=("${admin_role_id}")
+  for role_id in "${org_roles[@]}"; do
+    curl -sk "${auth[@]}" -X POST "${API}/role_user_assignments/" \
+      -d "{\"user\": ${user_id}, \"role_definition\": ${role_id}, \"object_id\": ${org_id}}" > /dev/null
+  done
 
   htpasswd -B -b "${htpasswd_file}" "${name}" "${PASSWORD_OF_USERS}" 2> /dev/null
 

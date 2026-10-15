@@ -1,0 +1,150 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: gitea
+---
+# Repositories, the SQLite database and app.ini (with its generated secret keys) all live here.
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: gitea-data
+  namespace: gitea
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 10Gi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: gitea
+  namespace: gitea
+  labels:
+    app: gitea
+spec:
+  replicas: 1
+  # ReadWriteOnce volume and SQLite: never run two pods at once.
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: gitea
+  template:
+    metadata:
+      labels:
+        app: gitea
+    spec:
+      containers:
+        - name: gitea
+          image: docker.io/gitea/gitea:1.27.3-rootless
+          # OpenShift runs the pod with a random UID that has no /etc/passwd entry, and
+          # Gitea refuses to start unless RUN_USER matches the running user. Set it at
+          # start; it is saved in app.ini, so "oc exec ... gitea admin" works too.
+          command:
+            - /bin/sh
+            - -c
+            - GITEA____RUN_USER="$(id -un 2>/dev/null || id -u)" exec /usr/bin/dumb-init -- /usr/local/bin/docker-entrypoint.sh
+          ports:
+            - name: http
+              containerPort: 3000
+          env:
+            # Keep app.ini on the volume so the generated tokens survive restarts.
+            - name: GITEA_APP_INI
+              value: /var/lib/gitea/custom/conf/app.ini
+            - name: GITEA__database__DB_TYPE
+              value: sqlite3
+            - name: GITEA__database__PATH
+              value: /var/lib/gitea/data/gitea.db
+            # Skip the web install wizard.
+            - name: GITEA__security__INSTALL_LOCK
+              value: "true"
+            # Users are created by deploy_gitea.sh only.
+            - name: GITEA__service__DISABLE_REGISTRATION
+              value: "true"
+            # Clone over HTTPS through the Route only; no SSH.
+            - name: GITEA__server__DISABLE_SSH
+              value: "true"
+            - name: GITEA__server__START_SSH_SERVER
+              value: "false"
+            - name: GITEA__server__HTTP_PORT
+              value: "3000"
+            # Webhooks must reach AAP even if its route resolves to a private address.
+            - name: GITEA__security__ALLOWED_HOST_LIST
+              value: "*"
+            # GITEA__server__ROOT_URL is set by deploy_gitea.sh from the Route host.
+          volumeMounts:
+            - name: data
+              mountPath: /var/lib/gitea
+            - name: etc
+              mountPath: /etc/gitea
+            - name: tmp
+              mountPath: /tmp
+          readinessProbe:
+            httpGet:
+              path: /api/healthz
+              port: http
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /api/healthz
+              port: http
+            initialDelaySeconds: 30
+            periodSeconds: 20
+          resources:
+            requests:
+              cpu: 100m
+              memory: 256Mi
+            limits:
+              cpu: "1"
+              memory: 1Gi
+          securityContext:
+            allowPrivilegeEscalation: false
+            runAsNonRoot: true
+            capabilities:
+              drop:
+                - ALL
+            seccompProfile:
+              type: RuntimeDefault
+      volumes:
+        - name: data
+          persistentVolumeClaim:
+            claimName: gitea-data
+        - name: etc
+          emptyDir: {}
+        - name: tmp
+          emptyDir: {}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: gitea
+  namespace: gitea
+  labels:
+    app: gitea
+spec:
+  selector:
+    app: gitea
+  ports:
+    - name: http
+      port: 3000
+      targetPort: http
+---
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  name: gitea
+  namespace: gitea
+  labels:
+    app: gitea
+spec:
+  to:
+    kind: Service
+    name: gitea
+  port:
+    targetPort: http
+  tls:
+    termination: edge
+    insecureEdgeTerminationPolicy: Redirect

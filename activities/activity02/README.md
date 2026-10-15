@@ -11,8 +11,9 @@ In Activity 1 you built your AAP objects by hand. Now you describe them in Git, 
 
 | | |
 |---|---|
-| Workshop repo to fork | `<git-repo-url>` (TODO: instructor to provide the repository URL) |
-| Your GitHub account | `<github-user>` |
+| Workshop repo to fork | `<git-repo-url>`, the same repo as in Activity 1 |
+| Your Git server | GitHub or Gitea. Your instructor tells you which one the workshop uses, and for Gitea its address, `https://<gitea-host>`. |
+| Your Git account | GitHub: your own account, `<github-user>`. Gitea: your AAP username and password. |
 | AAP URL and login | the same as Activity 1 |
 | Your organization | `<organization>`, the organization your Activity 1 objects belong to |
 | Your Activity 1 objects | Part A and Part B, both working |
@@ -29,11 +30,23 @@ You create three new objects by hand in this activity:
 
 ### Step 1: Fork the repo and look at the skeleton (10 min)
 
-Fork `<git-repo-url>` into your GitHub account, then clone your fork:
+Fork `<git-repo-url>` into your own account. Follow the option for your Git server.
+
+#### Option A: GitHub
+
+Log in to GitHub, open `<git-repo-url>` and click **Fork**, then **Create fork**. Your fork's URL is `https://github.com/<github-user>/AAP-WorkShop.git`.
+
+#### Option B: Gitea
+
+Log in to Gitea with your AAP username and password. Open `<git-repo-url>` and click **Fork**, then **Fork Repository**. Your fork's URL is `https://<gitea-host>/<username>/AAP-WorkShop.git`. When Git asks for a login, use the same username and password.
+
+#### Clone your fork
+
+In this activity and in Activity 3, `<fork-url>` means your fork's URL from above. Clone it:
 
 ```bash
-git clone https://github.com/<github-user>/<repo>.git
-cd <repo>/activities/activity02/aap_config_as_code
+git clone <fork-url>
+cd AAP-WorkShop/activities/activity02/aap_config_as_code
 ```
 
 This folder holds everything CaC uses:
@@ -75,7 +88,7 @@ Each `vars/main.yml` contains one example, modeled on your Part A objects. Value
 
 There is no role for credentials. Credentials stay in AAP, and job templates refer to them by name only.
 
-Expected result: your fork exists on GitHub, you have looked at the four rules.
+Expected result: your fork exists on GitHub or Gitea, and you have looked at the four roles.
 
 ### Step 2: Create the bootstrap objects (20 min)
 
@@ -97,7 +110,7 @@ Create `<username>-cac-project`:
 
 - Organization: `<organization>`
 - **Source control type**: Git
-- **Source control URL**: your fork, `https://github.com/<github-user>/<repo>.git`
+- **Source control URL**: your fork, `<fork-url>`
 - **Update revision on launch**: on
 
 Save it and wait until the sync shows **Successful**.
@@ -118,11 +131,17 @@ Create `<username>-cac-template`:
 - **Enable webhook**: on
 - **Webhook service**: GitHub
 
+Choose GitHub also when you use Gitea. Gitea sends its webhooks in the same format as GitHub, so AAP handles both the same way.
+
 Save it. The template now shows a **Webhook URL** and a **Webhook key**. Keep this page open for step 3.
 
 Expected result: three new objects, and the project sync shows **Successful**.
 
-### Step 3: Connect GitHub to AAP (15 min)
+### Step 3: Connect your fork to AAP (15 min)
+
+Follow the option for your Git server.
+
+#### Option A: GitHub
 
 In your fork on GitHub, open **Settings**, then **Webhooks**, then **Add webhook**, and fill in:
 
@@ -132,13 +151,33 @@ In your fork on GitHub, open **Settings**, then **Webhooks**, then **Add webhook
 - **Which events would you like to trigger this webhook?**: **Just the push event.**
 - **Active**: on
 
-Click **Add webhook**.
+Click **Add webhook**. GitHub sends a test event right away.
 
-Why: from now on GitHub calls AAP on every push. GitHub signs each call with the secret, and AAP rejects calls with a wrong signature. That way only your fork can start your job.
+To check a delivery later, open the webhook and go to the **Recent Deliveries** tab.
 
-GitHub sends a test event right away, and AAP starts your CaC job for it. That job fails at the task **Check that no example placeholders are left**. This is expected, because you haven't replaced the placeholders yet. It proves the webhook works.
+#### Option B: Gitea
 
-To check a delivery, open the webhook in GitHub and go to the **Recent Deliveries** tab. Click a delivery to see the request and AAP's response:
+In your fork on Gitea, open **Settings**, then **Webhooks**, then **Add Webhook**, and choose **Gitea**. Fill in:
+
+- **Target URL**: the **Webhook URL** from your job template
+- **HTTP Method**: POST
+- **POST Content Type**: `application/json`
+- **Secret**: the **Webhook key** from your job template
+- **Trigger On**: **Push Events**
+- **Branch filter**: `*`
+- **Active**: on
+
+Click **Add Webhook**. Gitea doesn't send a test event by itself: open the webhook you just created and click **Test Delivery**.
+
+To check a delivery later, open the webhook and scroll down to **Recent Deliveries**.
+
+#### Check the first delivery
+
+Why: from now on your Git server calls AAP on every push. It signs each call with the secret, and AAP rejects calls with a wrong signature. That way only your fork can start your job.
+
+AAP starts your CaC job for the test event. That job fails at the task **Check that no example placeholders are left**. This is expected, because you haven't replaced the placeholders yet. It proves the webhook works.
+
+Open the delivery in **Recent Deliveries** to see the request and AAP's response:
 
 - Response `202` with `{"message": "Job queued."}`: AAP accepted it and started a job.
 - Any other code, or a red warning icon: see Troubleshooting.
@@ -313,7 +352,7 @@ A deleted credential could NOT be restored this way. Git only holds its name, ne
 
 ### Step 8: Find the audit trail
 
-On GitHub, open your fork and click the commit count (or **Commits**) to see its history. Or run:
+On GitHub or Gitea, open your fork and click the commit count (**Commits**) to see its history. Or run:
 
 ```bash
 git log --oneline -- roles/
@@ -344,9 +383,9 @@ Two things to watch:
 
 ## 5. Troubleshooting
 
-- **Webhook shows a failed delivery in GitHub:** open the delivery and read the response. If there is no response or a timeout, check that the **Payload URL** is exactly the **Webhook URL** from AAP. If it is, tell the instructor: AAP may not be reachable from the internet.
-- **Response 403, or signature errors:** the **Secret** in GitHub must be exactly the **Webhook key** from AAP, the **Content type** must be `application/json`, and the job template must have **Enable webhook** on with **Webhook service** GitHub. If you generated a new webhook key in AAP, paste it into GitHub again. After fixing, click **Redeliver** on the failed delivery.
-- **Redeliver doesn't start a new job:** if AAP already ran a job for that delivery, it answers `Webhook previously received, aborting.` and starts nothing. Push a new commit or launch the job template in AAP instead.
+- **Webhook shows a failed delivery:** open the delivery and read the response. If there is no response or a timeout, check that the **Payload URL** (Gitea: **Target URL**) is exactly the **Webhook URL** from AAP. If it is, tell the instructor: AAP may not be reachable from your Git server.
+- **Response 403, or signature errors:** the **Secret** in the webhook must be exactly the **Webhook key** from AAP, the content type must be `application/json`, and the job template must have **Enable webhook** on with **Webhook service** GitHub (also when you use Gitea). If you generated a new webhook key in AAP, paste it into the webhook again. After fixing, send the failed delivery again: **Redeliver** on GitHub, the replay button next to the delivery on Gitea.
+- **Redelivery doesn't start a new job:** if AAP already ran a job for that delivery, it answers `Webhook previously received, aborting.` and starts nothing. Push a new commit or launch the job template in AAP instead.
 - **Job ran but nothing changed:** compare **Project revision used by this job** in the job output with your latest commit. If they differ, or the output shows a WARNING about the commit, turn on **Update revision on launch** on `<username>-cac-project`. Also check that you pushed to the branch the project uses.
 - **Duplicate objects appeared:** a name in Git doesn't match the original object. Fix the name in Git, and add a second entry with the wrong name and `state: absent` to remove the extra object. Push, and CaC deletes the duplicate while keeping your original.
 - **"Credential not found":** the job fails with an error like `Request to /api/controller/v2/credentials/?name=... returned 0 items, expected 1`. The credential name in `roles/deploy_job_templates/vars/main.yml` doesn't match the credential in AAP. The same message with `projects`, `inventories` or `organizations` in the path means that name doesn't match.
