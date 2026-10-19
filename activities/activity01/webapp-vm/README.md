@@ -32,9 +32,8 @@ Everyone shares this AAP, so start every object name with your username:
 
 ### Step 1: Make your own copy of the workshop repo
 
-You create an empty repo in your own account, then copy the workshop repo into it with Git.
-
-Why: every activity runs from your own repo. Later you change files in it, and only your AAP objects follow.
+Every Participant will work on his repository.
+Now, you will create an empty repo in your own account, then copy the workshop repo into it with Git.
 
 #### 1a. Create an empty repo
 
@@ -114,73 +113,35 @@ Save it and launch it.
 
 ### Step 6: Fix the missing variables
 
-Your job failed. Good. Read the error in the job output. It tells you what is missing, and it points you back to this section.
+The first run fails on purpose: the playbook needs two variables that aren't set yet. The job output names the missing one. Set it, run the job again, and do the same for the second one.
 
-Work out where the missing value should live, fix it, and run the job again. Don't open a hint until you've tried something. If the next run fails on something else, that's expected: repeat the same routine.
+In AAP, values that describe a host go in the inventory as host variables, and values chosen at each launch come from a survey on the job template.
 
 #### If the job complained about `nginx_port`
-
-Use port 8080.
-
-<details>
-<summary>Hint 1</summary>
-
-This value describes one particular machine, not the job and not the playbook. Where does AAP keep things it knows about a single host?
-
-</details>
-
-<details>
-<summary>Hint 2</summary>
-
-See the [AAP 2.7 docs on inventory variables](https://docs.redhat.com/en/documentation/red_hat_ansible_automation_platform/2.7/administer-proc_controller_adding_new_inventory#proc-controller-add-groups_procedure).
-
-</details>
 
 <details>
 <summary>Solution</summary>
 
-Open your inventory, open the host, and put this in its **Variables** field:
+Open your inventory, open the host, and put this in its **Variables** field, then save:
 
 ```yaml
 nginx_port: 8080
 ```
 
-Save.
+See the [AAP 2.7 docs on inventory variables](https://docs.redhat.com/en/documentation/red_hat_ansible_automation_platform/2.7/administer-proc_controller_adding_new_inventory#proc-controller-add-groups_procedure).
 
 </details>
 
 #### If the job complained about `page_title`
 
-Pick any title you like.
-
 <details>
-<summary>Hint 1</summary>
+<summary>Solution</summary>
 
-Nobody can decide this value in advance. The person launching the job chooses it every time. How can a job template ask for input at launch?
-
-</details>
-
-<details>
-<summary>Hint 2</summary>
+On your job template, add a survey with one Text question, required, with the answer variable name exactly `page_title`. Then turn the survey on: a survey that isn't enabled never shows up.
 
 See the [AAP 2.7 docs on surveys](https://docs.redhat.com/en/documentation/red_hat_ansible_automation_platform/2.7/develop-ref_controller_job_template_variables#controller-create-survey).
 
 </details>
-
-<details>
-<summary>Solution</summary>
-
-On your job template, add a survey with one question:
-
-- Answer variable name: exactly `page_title`
-- Type: Text
-- Required: yes
-
-Then make sure the survey is **enabled**. A survey that isn't enabled never shows up.
-
-</details>
-
-Why: values that describe a host go in the inventory. Values chosen at run time go in a survey.
 
 ### Step 7: Run it and open the page
 

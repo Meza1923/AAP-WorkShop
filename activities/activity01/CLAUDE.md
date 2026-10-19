@@ -52,9 +52,11 @@ For each step: what to do, why it matters (one or two sentences), expected resul
    5. Create a job template and run it. Expected: it FAILS on purpose. Add the note:
       "You may need more than one fix before the job succeeds."
    6. "Fix the missing variables" (title must match the playbook's failure message).
-      Per variable, tiered help: Hint 1 (conceptual nudge), Hint 2 (official docs link),
-      Solution in a collapsed `<details>` block. Survey answer variable name must be
-      exactly `page_title`, and the solution must mention enabling the survey.
+      Neutral tone, short. Before the solutions, at most one and a half sentences on
+      where variables live in AAP (host variables in the inventory, survey at launch).
+      Per variable, one collapsed `<details>` Solution block that includes the official
+      docs link. No separate hints. Survey answer variable name must be exactly
+      `page_title`, and the solution must mention enabling the survey.
    7. Run again, enter a title, open http://<vm-address>:8080, confirm the title appears.
    8. Run again with the same values, confirm changed=0, explain idempotency briefly.
 5. Troubleshooting: project sync fails; host unreachable (IP/user/key); privilege
