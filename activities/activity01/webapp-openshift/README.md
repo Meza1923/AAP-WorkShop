@@ -16,6 +16,7 @@ You'll deploy a small web page, the Automation Receipt, into your own OpenShift 
 | Namespace | `<namespace>` |
 | Service account token | `<token>` |
 | AAP URL and login | the same as Part A |
+| OpenShift CLI (`oc`) | [openshift-client-linux-4.20.33.tar.gz](https://mirror.openshift.com/pub/openshift-v4/clients/ocp/4.20.33/openshift-client-linux-4.20.33.tar.gz), for Linux. Download it and unpack it with `tar -xzf openshift-client-linux-4.20.33.tar.gz` before you start. |
 
 ## 3. Naming
 
