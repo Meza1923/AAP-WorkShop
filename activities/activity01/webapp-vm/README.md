@@ -9,13 +9,13 @@ You'll set up everything AAP needs to run a playbook on your own VM, then use it
 
 | | |
 |---|---|
-| VM address | `<vm-address>` |
+| VM address | Get from the drive |
 | SSH user | `ec2-user` |
 | SSH private key | `<ssh-private-key>` |
-| AAP URL | `<aap-url>` |
-| AAP login | `<username>` / `<password>` |
+| AAP URL | https://aap-aap.apps.cluster-vc4zx.vc4zx.sandbox2372.opentlc.com |
+| AAP login | userXX / Get from the drive |
 | Workshop repo | `<git-repo-url>`: `https://github.com/Meza1923/AAP-WorkShop.git` |
-| Git server for your own repo | GitHub or Gitea. Your instructor tells you which one the workshop uses, and for Gitea its address, `https://<gitea-host>`. |
+| Git server for your own repo | GitHub or Gitea. Your instructor tells you which one the workshop uses, and for Gitea its address, https://gitea-gitea.apps.cluster-vc4zx.vc4zx.sandbox2372.opentlc.com/. |
 | Git account | GitHub: your own account, `<github-user>`. Gitea: your AAP username and password. |
 | Your computer | A terminal with `git` installed |
 

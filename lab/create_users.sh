@@ -3,7 +3,7 @@ set -euo pipefail
 
 AAP_URL="https://aap-aap.apps.cluster-vc4zx.vc4zx.sandbox2372.opentlc.com/"
 TOKEN="a"
-PASSWORD_OF_USERS="a"
+PASSWORD_OF_USERS="aapworkshop77"
 NUM_USERS=10   # creates user1 .. user<NUM_USERS>
 ORG_FULL_ACCESS="true"   # "true": each user is Organization Admin of their own organization
 
