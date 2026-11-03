@@ -4,7 +4,7 @@
 controller_job_templates:  # noqa: var-naming[no-role-prefix]
   # Activity 1 Part A
   - name: cactest-nginx-template
-    state: present  # present = create or update (default), absent = delete
+    state: absent  # present = create or update (default), absent = delete
     organization: Default
     description: Deploys nginx on my VM. Managed by CaC.
     inventory: linux-servers
@@ -30,7 +30,7 @@ controller_job_templates:  # noqa: var-naming[no-role-prefix]
 
   # Activity 1 Part B
   - name: cactest-ocp-template
-    state: present  # present = create or update (default), absent = delete
+    state: absent  # present = create or update (default), absent = delete
     organization: Default
     description: Deploys the Automation Receipt on OpenShift. Managed by CaC.
     inventory: linux-servers
@@ -67,7 +67,7 @@ controller_job_templates:  # noqa: var-naming[no-role-prefix]
   # Activity 3. The token is the only answer to type: it is a secret and
   # must not be stored in this public repository.
   - name: admin-connect-alertmanager
-    state: present  # present = create or update (default), absent = delete
+    state: absent  # present = create or update (default), absent = delete
     organization: admin
     description: Routes my AutomationReceiptDown alert to my EDA event stream.
     inventory: linux-servers
@@ -106,7 +106,7 @@ controller_job_templates:  # noqa: var-naming[no-role-prefix]
           min: 0
           max: 1024
   - name: Workflow demo - Load test
-    state: present
+    state: absent
     organization: Test
     description: Stress tests nginx on the VM with ab and publishes the results.
     inventory: linux-servers
@@ -118,7 +118,7 @@ controller_job_templates:  # noqa: var-naming[no-role-prefix]
     become_enabled: true
 
   - name: Workflow demo - Check results
-    state: present
+    state: absent
     organization: Test
     description: Fails when the load test results exceed the survey limits.
     inventory: windows-servers
@@ -127,7 +127,7 @@ controller_job_templates:  # noqa: var-naming[no-role-prefix]
     execution_environment: Default execution environment
 
   - name: Workflow demo - Reload nginx
-    state: present
+    state: absent
     organization: Test
     description: Reloads nginx on the VM and checks the page responds.
     inventory: windows-servers
@@ -139,7 +139,7 @@ controller_job_templates:  # noqa: var-naming[no-role-prefix]
     become_enabled: true
 
   - name: Workflow demo - Notify passed
-    state: present
+    state: absent
     organization: Test
     description: Reports that the stress test passed.
     inventory: windows-servers
@@ -150,7 +150,7 @@ controller_job_templates:  # noqa: var-naming[no-role-prefix]
       notify_outcome: passed
 
   - name: Workflow demo - Notify capacity
-    state: present
+    state: absent
     organization: Test
     description: Reports that the server needs more capacity.
     inventory: windows-servers

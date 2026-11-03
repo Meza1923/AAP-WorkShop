@@ -1,35 +1,35 @@
 ---
 controller_projects:  # noqa: var-naming[no-role-prefix]
   - name: Github AAP-WorkShop
-    state: present  # present = create or update (default), absent = delete
+    state: absent  # present = create or update (default), absent = delete
     organization: Default
     scm_type: git
     scm_url: https://github.com/Meza1923/AAP-WorkShop.git
     scm_branch: main
     scm_update_on_launch: true  # every job uses the latest commit
   - name: Github AAP-Test
-    state: present  # present = create or update (default), absent = delete
+    state: absent  # present = create or update (default), absent = delete
     organization: Default
     scm_type: git
     scm_url: https://github.com/Meza1923/AAP-WorkShop.git
     scm_branch: main
     scm_update_on_launch: true  # every job uses the latest commit
   - name: admin-nginx-project
-    state: present  # present = create or update (default), absent = delete
+    state: absent  # present = create or update (default), absent = delete
     organization: admin
     scm_type: git
     scm_url: https://github.com/Meza1923/AAP-WorkShop.git
     scm_branch: main
     scm_update_on_launch: true  # every job uses the latest commit
   - name: cactest-nginx-project
-    state: present  # present = create or update (default), absent = delete
+    state: absent  # present = create or update (default), absent = delete
     organization: Default
     scm_type: git
     scm_url: https://github.com/Meza1923/AAP-WorkShop.git
     scm_branch: main
     scm_update_on_launch: true  # every job uses the latest commit
   - name: Github - AAP WorkShop
-    state: present  # present = create or update (default), absent = delete
+    state: absent  # present = create or update (default), absent = delete
     organization: Test
     scm_type: git
     scm_url: https://github.com/Meza1923/AAP-WorkShop.git
