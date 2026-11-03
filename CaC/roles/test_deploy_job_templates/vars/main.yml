@@ -110,7 +110,7 @@ controller_job_templates:  # noqa: var-naming[no-role-prefix]
     organization: admin
     description: Stress tests nginx on the VM with ab and publishes the results.
     inventory: linux-servers
-    project: admin-nginx-project
+    project: Github AAP-WorkShop
     playbook: workflow-demonstration/load-test.yml
     execution_environment: Default execution environment
     credentials:
@@ -122,7 +122,7 @@ controller_job_templates:  # noqa: var-naming[no-role-prefix]
     organization: admin
     description: Fails when the load test results exceed the survey limits.
     inventory: windows-servers
-    project: admin-nginx-project
+    project: Github AAP-WorkShop
     playbook: workflow-demonstration/check-results.yml
     execution_environment: Default execution environment
 
@@ -131,7 +131,7 @@ controller_job_templates:  # noqa: var-naming[no-role-prefix]
     organization: admin
     description: Reloads nginx on the VM and checks the page responds.
     inventory: windows-servers
-    project: admin-nginx-project
+    project: Github AAP-WorkShop
     playbook: workflow-demonstration/reload-nginx.yml
     execution_environment: Default execution environment
     credentials:
@@ -143,7 +143,7 @@ controller_job_templates:  # noqa: var-naming[no-role-prefix]
     organization: admin
     description: Reports that the stress test passed.
     inventory: windows-servers
-    project: admin-nginx-project
+    project: Github AAP-WorkShop
     playbook: workflow-demonstration/notify.yml
     execution_environment: Default execution environment
     extra_vars:
@@ -154,7 +154,7 @@ controller_job_templates:  # noqa: var-naming[no-role-prefix]
     organization: admin
     description: Reports that the server needs more capacity.
     inventory: windows-servers
-    project: admin-nginx-project
+    project: Github AAP-WorkShop
     playbook: workflow-demonstration/notify.yml
     execution_environment: Default execution environment
     extra_vars:
