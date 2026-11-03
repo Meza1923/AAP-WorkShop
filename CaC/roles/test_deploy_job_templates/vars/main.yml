@@ -12,7 +12,7 @@ controller_job_templates:  # noqa: var-naming[no-role-prefix]
     playbook: activities/activity01/webapp-vm/nginx.yml
     execution_environment: Default execution environment
     credentials:
-      - aws-bastion
+      - bastion-private-lab
     become_enabled: true
     survey_enabled: true
     survey_spec:
@@ -38,7 +38,7 @@ controller_job_templates:  # noqa: var-naming[no-role-prefix]
     playbook: activities/activity01/webapp-openshift/receipt.yml
     execution_environment: Default execution environment
     credentials:
-      - cactest-ocp-credential
+      - openshift
     extra_vars:
       managed_by: cac
     survey_enabled: true
@@ -74,7 +74,7 @@ controller_job_templates:  # noqa: var-naming[no-role-prefix]
     playbook: activities/activity02/aap_config_as_code/deploy_main.yaml
     execution_environment: cac-image
     credentials:
-      - aap
+      - bastion-private-lab
 
   # Activity 3. The token is the only answer to type: it is a secret and
   # must not be stored in this public repository.
@@ -87,7 +87,7 @@ controller_job_templates:  # noqa: var-naming[no-role-prefix]
     playbook: activities/activity03/connect-alertmanager/connect.yml
     execution_environment: Default execution environment
     credentials:
-      - cactest-ocp-credential
+      - openshift
     survey_enabled: true
     survey_spec:
       name: ""
@@ -126,7 +126,7 @@ controller_job_templates:  # noqa: var-naming[no-role-prefix]
     playbook: workflow-demonstration/load-test.yml
     execution_environment: Default execution environment
     credentials:
-      - admin-nginx-credential
+      - bastion-private-lab
     become_enabled: true
 
   - name: Workflow demo - Check results
@@ -147,7 +147,7 @@ controller_job_templates:  # noqa: var-naming[no-role-prefix]
     playbook: workflow-demonstration/reload-nginx.yml
     execution_environment: Default execution environment
     credentials:
-      - admin-nginx-credential
+      - bastion-private-lab
     become_enabled: true
 
   - name: Workflow demo - Notify passed
