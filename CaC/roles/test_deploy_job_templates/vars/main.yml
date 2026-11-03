@@ -68,10 +68,10 @@ controller_job_templates:  # noqa: var-naming[no-role-prefix]
   # must not be stored in this public repository.
   - name: admin-connect-alertmanager
     state: present  # present = create or update (default), absent = delete
-    organization: Test
+    organization: admin
     description: Routes my AutomationReceiptDown alert to my EDA event stream.
     inventory: linux-servers
-    project: cactest-nginx-project
+    project: admin-nginx-project
     playbook: activities/activity03/connect-alertmanager/connect.yml
     execution_environment: Default execution environment
     credentials:
