@@ -1,8 +1,13 @@
 ---
-# Test data: one project, the workshop repository. Every activity playbook
-# lives in it, so all job templates below use it.
 controller_projects:  # noqa: var-naming[no-role-prefix]
-  - name: cactest-nginx-project
+  - name: Github AAP-WorkShop
+    state: present  # present = create or update (default), absent = delete
+    organization: Default
+    scm_type: git
+    scm_url: https://github.com/Meza1923/AAP-WorkShop.git
+    scm_branch: main
+    scm_update_on_launch: true  # every job uses the latest commit
+  - name: Github AAP-Test
     state: present  # present = create or update (default), absent = delete
     organization: Default
     scm_type: git

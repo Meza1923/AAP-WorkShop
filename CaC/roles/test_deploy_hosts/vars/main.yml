@@ -1,12 +1,27 @@
 ---
-# 192.0.2.10 stands in for the workshop VM: no VM exists yet. Replace it with
-# the real VM address to run Part A. localhost needs no variables.
 controller_hosts:  # noqa: var-naming[no-role-prefix]
   - name: ec2-63-183-3-83.eu-central-1.compute.amazonaws.com
     state: present  # present = create or update (default), absent = delete
-    inventory: cactest-nginx-inventory
+    inventory: linux-servers
     variables:
       nginx_port: 8080
-  - name: localhost
+  - name: vm01
     state: present  # present = create or update (default), absent = delete
-    inventory: cactest-ocp-inventory
+    inventory: linux-servers
+    variables:
+      app: dev
+  - name: vm02
+    state: present  # present = create or update (default), absent = delete
+    inventory: linux-servers
+    variables:
+      app: prod
+  - name: windows01
+    state: present  # present = create or update (default), absent = delete
+    inventory: windows-servers
+    variables:
+      app: dev
+  - name: windows02
+    state: present  # present = create or update (default), absent = delete
+    inventory: windows-servers
+    variables:
+      app: prod

@@ -7,7 +7,7 @@ controller_job_templates:  # noqa: var-naming[no-role-prefix]
     state: present  # present = create or update (default), absent = delete
     organization: Default
     description: Deploys nginx on my VM. Managed by CaC.
-    inventory: cactest-nginx-inventory
+    inventory: linux-servers
     project: cactest-nginx-project
     playbook: activities/activity01/webapp-vm/nginx.yml
     execution_environment: Default execution environment
@@ -33,7 +33,7 @@ controller_job_templates:  # noqa: var-naming[no-role-prefix]
     state: present  # present = create or update (default), absent = delete
     organization: Default
     description: Deploys the Automation Receipt on OpenShift. Managed by CaC.
-    inventory: cactest-ocp-inventory
+    inventory: linux-servers
     project: cactest-nginx-project
     playbook: activities/activity01/webapp-openshift/receipt.yml
     execution_environment: Default execution environment
@@ -69,7 +69,7 @@ controller_job_templates:  # noqa: var-naming[no-role-prefix]
     state: present  # present = create or update (default), absent = delete
     organization: Default
     description: Applies the Activity 2 CaC configuration. Managed by CaC.
-    inventory: cactest-ocp-inventory
+    inventory: linux-servers
     project: cactest-nginx-project
     playbook: activities/activity02/aap_config_as_code/deploy_main.yaml
     execution_environment: cac-image
@@ -80,9 +80,9 @@ controller_job_templates:  # noqa: var-naming[no-role-prefix]
   # must not be stored in this public repository.
   - name: admin-connect-alertmanager
     state: present  # present = create or update (default), absent = delete
-    organization: Default
+    organization: Test
     description: Routes my AutomationReceiptDown alert to my EDA event stream.
-    inventory: cactest-ocp-inventory
+    inventory: linux-servers
     project: cactest-nginx-project
     playbook: activities/activity03/connect-alertmanager/connect.yml
     execution_environment: Default execution environment
@@ -121,7 +121,7 @@ controller_job_templates:  # noqa: var-naming[no-role-prefix]
     state: present
     organization: admin
     description: Stress tests nginx on the VM with ab and publishes the results.
-    inventory: admin-nginx-inventory
+    inventory: linux-servers
     project: admin-nginx-project
     playbook: workflow-demonstration/load-test.yml
     execution_environment: Default execution environment
@@ -133,7 +133,7 @@ controller_job_templates:  # noqa: var-naming[no-role-prefix]
     state: present
     organization: admin
     description: Fails when the load test results exceed the survey limits.
-    inventory: admin-nginx-inventory
+    inventory: windows-servers
     project: admin-nginx-project
     playbook: workflow-demonstration/check-results.yml
     execution_environment: Default execution environment
@@ -142,7 +142,7 @@ controller_job_templates:  # noqa: var-naming[no-role-prefix]
     state: present
     organization: admin
     description: Reloads nginx on the VM and checks the page responds.
-    inventory: admin-nginx-inventory
+    inventory: windows-servers
     project: admin-nginx-project
     playbook: workflow-demonstration/reload-nginx.yml
     execution_environment: Default execution environment
@@ -154,7 +154,7 @@ controller_job_templates:  # noqa: var-naming[no-role-prefix]
     state: present
     organization: admin
     description: Reports that the stress test passed.
-    inventory: admin-nginx-inventory
+    inventory: windows-servers
     project: admin-nginx-project
     playbook: workflow-demonstration/notify.yml
     execution_environment: Default execution environment
@@ -165,7 +165,7 @@ controller_job_templates:  # noqa: var-naming[no-role-prefix]
     state: present
     organization: admin
     description: Reports that the server needs more capacity.
-    inventory: admin-nginx-inventory
+    inventory: windows-servers
     project: admin-nginx-project
     playbook: workflow-demonstration/notify.yml
     execution_environment: Default execution environment

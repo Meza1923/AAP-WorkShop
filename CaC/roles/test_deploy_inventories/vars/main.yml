@@ -1,10 +1,11 @@
 ---
-# Test data: the VM inventory (Activity 1 Part A) and the localhost inventory
-# used by Part B, Activity 2 and Activity 3.
 controller_inventories:  # noqa: var-naming[no-role-prefix]
-  - name: cactest-nginx-inventory
+  - name: nginx-inventory
     state: present  # present = create or update (default), absent = delete
     organization: Default
-  - name: cactest-ocp-inventory
+  - name: linux-servers
     state: present  # present = create or update (default), absent = delete
-    organization: Default
+    organization: Test
+  - name: windows-servers
+    state: present  # present = create or update (default), absent = delete
+    organization: Test
