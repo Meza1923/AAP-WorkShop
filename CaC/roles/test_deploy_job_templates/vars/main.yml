@@ -107,10 +107,10 @@ controller_job_templates:  # noqa: var-naming[no-role-prefix]
           max: 1024
   - name: Workflow demo - Load test
     state: present
-    organization: admin
+    organization: Test
     description: Stress tests nginx on the VM with ab and publishes the results.
     inventory: linux-servers
-    project: Github AAP-WorkShop
+    project: Github - AAP WorkShop
     playbook: workflow-demonstration/load-test.yml
     execution_environment: Default execution environment
     credentials:
@@ -119,19 +119,19 @@ controller_job_templates:  # noqa: var-naming[no-role-prefix]
 
   - name: Workflow demo - Check results
     state: present
-    organization: admin
+    organization: Test
     description: Fails when the load test results exceed the survey limits.
     inventory: windows-servers
-    project: Github AAP-WorkShop
+    project: Github - AAP WorkShop
     playbook: workflow-demonstration/check-results.yml
     execution_environment: Default execution environment
 
   - name: Workflow demo - Reload nginx
     state: present
-    organization: admin
+    organization: Test
     description: Reloads nginx on the VM and checks the page responds.
     inventory: windows-servers
-    project: Github AAP-WorkShop
+    project: Github - AAP WorkShop
     playbook: workflow-demonstration/reload-nginx.yml
     execution_environment: Default execution environment
     credentials:
@@ -140,10 +140,10 @@ controller_job_templates:  # noqa: var-naming[no-role-prefix]
 
   - name: Workflow demo - Notify passed
     state: present
-    organization: admin
+    organization: Test
     description: Reports that the stress test passed.
     inventory: windows-servers
-    project: Github AAP-WorkShop
+    project: Github - AAP WorkShop
     playbook: workflow-demonstration/notify.yml
     execution_environment: Default execution environment
     extra_vars:
@@ -151,10 +151,10 @@ controller_job_templates:  # noqa: var-naming[no-role-prefix]
 
   - name: Workflow demo - Notify capacity
     state: present
-    organization: admin
+    organization: Test
     description: Reports that the server needs more capacity.
     inventory: windows-servers
-    project: Github AAP-WorkShop
+    project: Github - AAP WorkShop
     playbook: workflow-demonstration/notify.yml
     execution_environment: Default execution environment
     extra_vars:
